@@ -36,7 +36,7 @@ export default function Verification() {
         <div className="">
           <p className="text-gray-500">Hey {userData?.name} 👋</p>
           <h2 className="text-[40px] font-bold text-themecolor bigScreen:text-[60px]  mobile:max-sm:w-full ">
-            Welcome To POCKERPLAY
+            Welcome To PockerPlay
           </h2>
           <p className="text-gray-500">Excited to have fun?</p>
           <button className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full">
