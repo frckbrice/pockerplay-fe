@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "pockerPlay play and have fun",
   manifest: "/manifest.json",
   icons: { apple: "/public/icon-512x512.png" },
-  themeColor: "#1C0F32",
+  // themeColor: "#1C0F32",
 };
 
 export default function RootLayout({
