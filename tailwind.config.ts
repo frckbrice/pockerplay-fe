@@ -19,6 +19,7 @@ const config: Config = {
       },
       colors: {
         themecolor: "#22113D",
+        bgGray: "#f1f1f1",
       },
     },
   },
