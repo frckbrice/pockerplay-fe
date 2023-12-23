@@ -1,9 +1,10 @@
+import HomeNav from "@/components/organisms/HomeNav";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>welcome to PockerPlay</h1>
+    <main className="flex min-h-screen flex-col bg-[#f1f1f1] justify-between">
+      <HomeNav hidden={false} />
     </main>
   );
 }
