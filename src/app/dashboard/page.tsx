@@ -3,6 +3,7 @@
 import ActionBtn from "@/components/atoms/ActionBtn";
 import Avatar from "@/components/atoms/Avatar";
 import Card from "@/components/atoms/Card";
+import Overlay from "@/components/atoms/Overlay";
 import Scores from "@/components/organisms/Scores";
 import { useState } from "react";
 

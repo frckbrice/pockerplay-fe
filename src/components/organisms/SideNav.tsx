@@ -7,16 +7,27 @@ import Link from "next/link";
 
 export default function SideNav() {
   const [openLogout, setOpenLogout] = useState(false);
+  const [startNewGame, setStartNewGame] = useState(false);
+
   return (
     <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2 px-4">
-      <div className="text-white font-bold">
-        <Link href={"/"}>
-          <h3 className="">PockerPlay</h3>
-        </Link>
-      </div>
-      <div>
-        <div></div>
-        <div></div>
+      <div className="flex flex-col gap-30">
+        <div className="text-white font-bold mb-[40px]">
+          <Link href={"/"}>
+            <h3 className="">PockerPlay</h3>
+          </Link>
+        </div>
+        <div>
+          <div>
+            <button className="bg-white p-2 rounded text-themecolor">
+              New Game
+            </button>
+          </div>
+          <div>
+            {" "}
+            <h2>users</h2>
+          </div>
+        </div>
       </div>
 
       <button
@@ -38,6 +49,16 @@ export default function SideNav() {
             actionBTNStyle={"border border-red-600 text-red-600"}
           />
           <Overlay onClick={() => setOpenLogout((prev) => !prev)} transparent />
+        </>
+      )}
+
+      {startNewGame && (
+        <>
+          <Overlay
+            onClick={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
         </>
       )}
     </div>
