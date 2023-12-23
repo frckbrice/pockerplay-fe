@@ -27,7 +27,6 @@ const Popups = ({
         <h3 className="text-[20px] text-primaryText">{title}</h3>
         <p className="text-xs text-primaryText min-h-10">{content}</p>
       </div>
-
       <div className="flex self-end gap-5">
         <button
           onClick={onCancel}

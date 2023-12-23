@@ -4,6 +4,8 @@ import { CiLogout } from "react-icons/ci";
 import Overlay from "../atoms/Overlay";
 import Popups from "../atoms/Popups";
 import Link from "next/link";
+import CreateGame from "./CreateGame";
+import { toast } from "react-toastify";
 
 export default function SideNav() {
   const [openLogout, setOpenLogout] = useState(false);
@@ -32,7 +34,7 @@ export default function SideNav() {
 
       <button
         onClick={() => setOpenLogout((prev) => !prev)}
-        className="flex items-center justify-center border border-gray-400 py-1 text-white gap-3 px-4"
+        className="flex items-center justify-center  py-1 text-white gap-3 px-4"
       >
         <CiLogout /> <span>logout</span>
       </button>
@@ -61,6 +63,8 @@ export default function SideNav() {
           />
         </>
       )}
+      {/* <Overlay />
+      <CreateGame /> */}
     </div>
   );
 }

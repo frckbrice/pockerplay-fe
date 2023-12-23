@@ -1,11 +1,12 @@
 "use client";
-
-import ActionBtn from "@/components/atoms/ActionBtn";
-import Avatar from "@/components/atoms/Avatar";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import Card from "@/components/atoms/Card";
-import Overlay from "@/components/atoms/Overlay";
 import Scores from "@/components/organisms/Scores";
 import { useState } from "react";
+
+// react icons
+import { PiCopySimpleLight } from "react-icons/pi";
+import { toast } from "react-toastify";
 
 export default function Page() {
   const [generatedData, setGenerataedData] = useState<Array<any>>([]);
@@ -61,6 +62,14 @@ export default function Page() {
 
   const handleGenerate = () => {
     setGenerataedData(cardData);
+  };
+
+  const handleCopy = () => {
+    toast.success("Copied!", {
+      position: "top-right",
+      hideProgressBar: true,
+      autoClose: 3000,
+    });
   };
 
   return (
@@ -128,6 +137,23 @@ export default function Page() {
               className={"w-[80px] h-[80px]"}
             />
             <span>YOU</span>
+          </div>
+
+          <div className="flex gap-3 items-center justify-center">
+            <CopyToClipboard
+              text="this is the shit you copied"
+              onCopy={handleCopy}
+            >
+              <button
+                // onClick={handleCopy}
+                className="flex gap-1  items-center p-2  text-green-600"
+              >
+                <span className="text-green-600">
+                  your link is ready, copy!
+                </span>
+                <PiCopySimpleLight size={20} />
+              </button>
+            </CopyToClipboard>
           </div>
 
           <div className="flex flex-col justify-center items-center">
