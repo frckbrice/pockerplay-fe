@@ -1,13 +1,15 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 type Props = {
   hidden: boolean;
 };
 
 const HomeNav = ({ hidden }: Props) => {
-  const user = localStorage.getItem("userData") || [];
+  // const [user, setUser] = useState(localStorage.getItem("userData") || []);
+  const user = [];
 
   return (
     <div className="flex justify-between items-center bg-white mobile:max-sm:px-5 px-24 py-3">

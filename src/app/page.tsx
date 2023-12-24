@@ -1,3 +1,4 @@
+"use client";
 import HomeNav from "@/components/organisms/HomeNav";
 import Image from "next/image";
 import Link from "next/link";
