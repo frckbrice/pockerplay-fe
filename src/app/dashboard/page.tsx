@@ -10,16 +10,6 @@ import { api_call } from "@/utils/service/constant";
 import { PiCopySimpleLight } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-export const socket = io(api_call || "", {
-  path: "/socket.io/",
-  reconnectionDelay: 1000,
-  reconnection: true,
-  reconnectionAttempts: 10,
-  transports: ["websocket"],
-  agent: false,
-  upgrade: false,
-  rejectUnauthorized: false,
-});
 
 export default function Page() {
   const router = useRouter();
