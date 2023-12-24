@@ -18,7 +18,7 @@ const config: Config = {
         bigScreen: "1700px",
       },
       colors: {
-        themecolor: "#22113D",
+        themecolor: "#3F1558",
         bgGray: "#f1f1f1",
       },
     },

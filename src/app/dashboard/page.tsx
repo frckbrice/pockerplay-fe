@@ -82,7 +82,7 @@ export default function Page() {
               name="Type"
               defaultValue="Words"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none  drop-shadow-md text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
+              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
             >
               <option
                 className="hover:bg-themecolor p-2 focus:bg-themecolor hover:text-white"
@@ -97,7 +97,7 @@ export default function Page() {
               name="Type"
               defaultValue="cards"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none  drop-shadow-md text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
+              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
             >
               <option value="cards">cards</option>
               <option value="animals">animals</option>
@@ -111,7 +111,7 @@ export default function Page() {
               name="Number"
               defaultValue="5"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none  drop-shadow-md text-themecolor border  w-[4rem] duration-300"
+              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border  w-[4rem] duration-300"
             >
               <option value="5">5</option>
               <option value="6">6</option>

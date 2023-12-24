@@ -12,16 +12,16 @@ export default function SideNav() {
   const [startNewGame, setStartNewGame] = useState(false);
 
   return (
-    <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2 px-4">
-      <div className="flex flex-col gap-30">
+    <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2">
+      <div className="flex flex-col w-full gap-30">
         <div className="text-white font-bold mb-[40px]">
           <Link href={"/"}>
-            <h3 className="">PockerPlay</h3>
+            <h3 className=" text-center">PockerPlay</h3>
           </Link>
         </div>
         <div>
           <div>
-            <button className="bg-white p-2 rounded text-themecolor">
+            <button className="hover:bg-white duration-300 text-white w-full p-2  hover:text-themecolor">
               New Game
             </button>
           </div>
@@ -34,7 +34,7 @@ export default function SideNav() {
 
       <button
         onClick={() => setOpenLogout((prev) => !prev)}
-        className="flex items-center justify-center  py-1 text-white gap-3 px-4"
+        className="flex items-center justify-center  py-1 hover:bg-white duration-300  hover:text-themecolor w-full text-white gap-3 px-4"
       >
         <CiLogout /> <span>logout</span>
       </button>

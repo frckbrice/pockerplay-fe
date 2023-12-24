@@ -30,3 +30,12 @@
     transform: rotate(360deg);
   }
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c6c6c5;
+  height: 40px;
+}
