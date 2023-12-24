@@ -90,13 +90,7 @@ export default function Page() {
     });
   };
 
-  const createNewGame = () => {
-    socket.emit("init", { home_player_id: homePlayer });
-  };
-
-  socket.on("init", (data) => {
-    if (data) router.push(`${window.location}/${data}`);
-  });
+  const createNewGame = () => {};
 
   return (
     <main>
