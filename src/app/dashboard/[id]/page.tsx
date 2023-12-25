@@ -150,6 +150,21 @@ export default function Page() {
     if (!choiceReceived) socket.emit("send_choice", choiceData);
     else socket.emit("send_guess", guessData);
   };
+  //  const handleKeyDown = (e: any) => {
+  //    if (e.key === "Enter") {
+  //      setTypingStatus("");
+  //      handleSendMessage();
+  //    }
+  //    socket.emit("typing", {
+  //      room: param.id,
+  //      owner: currentUser?.id,
+  //    });
+  //  };
+
+  //  socket.on("typingResponse", (data) => {
+  //    console.log(data);
+  //    setTypingStatus(data);
+  //  });
   const handleCopy = () => {
     toast.success("Copied!", {
       position: "top-right",
