@@ -1,3 +1,4 @@
+"use client";
 import GoogleSignUpBtn from "@/components/molucles/GoogleSignUpBtn";
 import Image from "next/image";
 import Link from "next/link";

@@ -19,6 +19,7 @@ const config: Config = {
       },
       colors: {
         themecolor: "#3F1558",
+        lightPupple: "#5438D5",
         bgGray: "#f1f1f1",
       },
     },
