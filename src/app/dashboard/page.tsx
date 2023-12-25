@@ -5,7 +5,7 @@ import Scores from "@/components/organisms/Scores";
 import { useEffect, useState } from "react";
 import io from "socket.io-client";
 import { api_call } from "@/utils/service/constant";
-
+import { socket } from "./[id]/page";
 // react icons
 import { PiCopySimpleLight } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -23,7 +23,6 @@ export default function Page() {
   const [guessChoice, setGuessChoice] = useState<string>("");
   const [catergory, setCategory] = useState<string>("");
   const [hintMessage, setHintMessage] = useState<string>("");
-  const [gameUrl, setGameUrl] = useState<string>("");
 
   const cardData = [
     {
@@ -80,7 +79,13 @@ export default function Page() {
     });
   };
 
-  const createNewGame = () => {};
+  const createNewGame = () => {
+    if (homePlayer) socket.emit("init", { home_player_id: homePlayer });
+  };
+
+  socket.on("init", (data) => {
+    if (data) router.push(`/${window.location.pathname}/${data}`);
+  });
 
   return (
     <main>

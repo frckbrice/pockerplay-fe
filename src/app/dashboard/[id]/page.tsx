@@ -2,14 +2,26 @@
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Card from "@/components/atoms/Card";
 import Scores from "@/components/organisms/Scores";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // react icons
 import { PiCopySimpleLight } from "react-icons/pi";
 import { toast } from "react-toastify";
-
+import io from "socket.io-client";
+import { api_call } from "@/utils/service/constant";
+import { useParams } from "next/navigation";
+export const socket = io(api_call || "", {
+  path: "/socket.io/",
+  reconnectionDelay: 1000,
+  reconnection: true,
+  reconnectionAttempts: 10,
+  transports: ["websocket"],
+  agent: false,
+  upgrade: false,
+  rejectUnauthorized: false,
+});
 export default function Page() {
-  const [generatedData, setGenerataedData] = useState<Array<any>>([]);
+  const [generatedData, setGenerataedData] = useState<Array<string>>([]);
   const [selectedCard, setSelectedCard] = useState<CardType>();
   const [score, setScore] = useState<Score>();
   const [homePlayer, setHomePlayer] = useState<User>();
@@ -17,17 +29,56 @@ export default function Page() {
   const [round, setRound] = useState<Round>();
   const [homeChoice, setHomeChoice] = useState<string>("");
   const [guessChoice, setGuessChoice] = useState<string>("");
+  const [guessGuess, setGuessGuess] = useState<string>("");
+  const [homeGuess, setHomeGuess] = useState<string>("");
   const [category, setCategory] = useState<string>("words");
   const [numberOfOptions, setNumberOfOptions] = useState<number>(5);
-  const [hintMessage, setHintMessage] = useState<string>("");
-  //  const [selectedCard, setSelectedCard] = useState<CardType>();
+  const [homeplayerHint, setHomePlayerHint] = useState<string>("");
+  const [guessPlayerHint, setGuessPlayerHint] = useState<string>("");
+  const [gameUrl, setGameUrl] = useState<string>("");
+  const [game, setGame] = useState<GameSession>();
+  const params = useParams();
+  useEffect(() => {
+    setGameUrl(window.location.toString());
+  }, []);
 
   const cardData: any[] = [];
-
+  socket.on("generate", (data) => {
+    if (data) {
+      setRound(data);
+      setGenerataedData(data.proposals);
+    }
+  });
   const handleGenerate = () => {
-    setGenerataedData(cardData);
+    const data = {
+      gamesession_id: params ? params : "",
+      category,
+      number_of_proposals: numberOfOptions,
+      round_number: round?.round_number ? round.round_number : 0,
+    };
+    if (data.round_number > 5) alert("this is the end of game");
+    socket.emit("generate", data);
   };
-
+  socket.on("receive_guess", (data) => {
+    if (data) {
+      if (data.role === "home_player") {
+        setHomeGuess(data.guess);
+      } else if (data.role === "guess_player") {
+        setGuessGuess(data.guess);
+      }
+    }
+  });
+  socket.on("receive_choice", (data) => {
+    if (data) {
+      if (data.role === "home_player") {
+        setGenerataedData(data.proposals);
+        setGuessPlayerHint(data.message);
+      } else if (data.role === "guess_player") {
+        setGenerataedData(data.proposals);
+        setHomePlayerHint(data.message);
+      }
+    }
+  });
   const handleCopy = () => {
     toast.success("Copied!", {
       position: "top-right",
@@ -35,6 +86,17 @@ export default function Page() {
       autoClose: 3000,
     });
   };
+  socket.on("endGame", (data) => {
+    if (data) {
+      if (data.role === "home_player") {
+        setHomeGuess(data.guess);
+      } else if (data.role === "guess_player") {
+        setGuessGuess(data.guess);
+      }
+      if (data.gameState === "end Game") alert("the game is finish! retry...");
+      setGame(data.game);
+    }
+  });
 
   return (
     <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
@@ -104,21 +166,19 @@ export default function Page() {
               text={""}
               className={"w-[80px] h-[80px]"}
             />
-            <span>YOU</span>
+            <span>{homePlayer?.username}</span>
           </div>
 
           <div className="flex gap-3 items-center justify-center">
             <CopyToClipboard
-              text="this is the shit you copied"
+              text="this is the link you copied"
               onCopy={handleCopy}
             >
               <button
                 // onClick={handleCopy}
                 className="flex gap-1  items-center p-2  text-green-600"
               >
-                <span className="text-green-600">
-                  your link is ready, copy!
-                </span>
+                <span className="text-green-600">{gameUrl ? gameUrl : ""}</span>
                 <PiCopySimpleLight size={20} />
               </button>
             </CopyToClipboard>
@@ -155,7 +215,7 @@ export default function Page() {
       <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md  h-full px-2 py-4 gap-5">
         <Scores />
         <div className="flex border border-themecolor rounded-[5px] p-2 justify-center gap-4 font-extrabold text-themecolor">
-          <span>0/5</span>
+          <span>{`${round?.round_number}/5`}</span>
           <span>Rounds</span>
         </div>
 
