@@ -36,11 +36,22 @@ export default function Page() {
   };
 
   socket.on("init", (data) => {
-    if (data) router.push(`/${window.location.pathname}/${data}`);
-    setIsLoading((prev) => !prev);
-    setTimeout(() => {
-      router.push("/dashboard/23h232304234h2342342232");
-    }, 500);
+    if (data) {
+      if (data.state === "new game") {
+        toast.success("new game created!", {
+          position: "top-right",
+          hideProgressBar: false,
+          autoClose: 3000,
+        });
+        router.push(`/dashboard/${data.game}`);
+      } else {
+        console.log("data from db", data);
+      }
+    }
+    // setIsLoading((prev) => !prev);
+    // setTimeout(() => {
+    //   router.push("/dashboard/23h232304234h2342342232");
+    // }, 500);
   });
 
   return (

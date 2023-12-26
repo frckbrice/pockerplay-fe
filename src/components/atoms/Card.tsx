@@ -17,15 +17,17 @@ export default function Card({
     <button
       onClick={onClick}
       style={{
-        backgroundImage: `url(${category === "images" ? image : ""})`,
+        backgroundImage: `url(${category === "Images" ? image : ""})`,
 
         backgroundSize: "cover",
         backgroundPosition: "center",
         objectFit: "fill",
       }}
-      className={` ${className} border-2 rounded-md border-gray-300 flex justify-center items-center`}
+      className={` ${className} border-2 rounded-md border-gray-300 flex justify-center items-center text-black`}
     >
-      <h2>{category === "words" ? text : ""}</h2>
+      <h2 className=" w-fit">
+        {category === "words" ? text.substring(0, 8) : ""}
+      </h2>
     </button>
   );
 }

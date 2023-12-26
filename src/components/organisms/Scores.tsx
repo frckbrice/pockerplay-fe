@@ -13,16 +13,12 @@ export default function Scores(props: Props) {
       <div className="flex justify-between w-full items-center">
         <div className="flex flex-col items-center justify-center">
           <Avatar profilePicture={""} size={3} />
-          <span>
-            {props.homePlayer
-              ? props.homePlayer?.username.split(" ")[0]
-              : "You"}
-          </span>
+          <span>{props.homePlayer?.username.split(" ")[0] ?? "You"}</span>
         </div>
         <div>
           <p>
-            {props.score ? props.score?.home_player_score : "0"} :
-            {props.score ? props.score?.guess_player_score : "0"}
+            {props.score?.home_player_score ?? "0"} :
+            {props.score?.guess_player_score ?? "0"}
           </p>
         </div>
         <div className="flex flex-col items-center justify-center">
