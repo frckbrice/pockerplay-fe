@@ -5,7 +5,7 @@ import Scores from "@/components/organisms/Scores";
 import { useEffect, useState } from "react";
 // import io from "socket.io-client";
 import { api_call } from "@/utils/service/constant";
-import { socket } from "./[id]/page";
+import { socket } from "@/utils/service/constant";
 // react icons
 import { PiCopySimpleLight } from "react-icons/pi";
 import { toast } from "react-toastify";
