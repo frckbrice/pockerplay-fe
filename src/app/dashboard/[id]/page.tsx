@@ -51,6 +51,8 @@ export default function Page() {
   const params = useParams();
   let i: number = 1;
   useEffect(() => {
+    localStorage.setItem("currentGame", gameUrl);
+
     setGameUrl(`${public_call}/dashboard/${params.id}`);
     if (guessPlayer)
       socket.emit("joingame", {
@@ -61,7 +63,7 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-  }, [homePlayer?.id, guessPlayer, params, homePlayer, router]);
+  }, [homePlayer?.id, guessPlayer, params, homePlayer, gameUrl]);
 
   socket.on("round", (data) => {
     if (data) {
@@ -202,7 +204,7 @@ export default function Page() {
   // console.log("homePlayer", homePlayer);
   if (!homePlayer) {
     console.log("no home player");
-    return router.push("/dashboard/register");
+    return router.push("/register");
   } else {
     return (
       <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
