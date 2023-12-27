@@ -49,10 +49,9 @@ export default function Verification() {
     userVerification();
   }, []);
 
-  console.log("googleData", userData);
-
   (async function () {
     if (userData) {
+      console.log("googleData", userData);
       const user = await signupFn(userData as User);
       if (user) {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));
