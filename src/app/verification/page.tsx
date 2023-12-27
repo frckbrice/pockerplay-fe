@@ -8,6 +8,7 @@ import { userVerification } from "@/utils/service/api-call";
 import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
+import { signupUser } from "@/utils/service/api";
 
 export default function Verification() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function Verification() {
   (async function () {
     if (userData) {
       console.log("googleData", userData);
-      const user = await signupFn(userData as User);
+      const user = await signupUser(userData as User);
       if (user) {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));
       }
