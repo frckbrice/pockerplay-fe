@@ -101,7 +101,7 @@ export default function Page() {
           <div className="flex flex-col justify-center items-center">
             <Card
               image={selectedCard?.image || ""}
-              text={""}
+              text={"?"}
               className={"w-[80px] h-[80px]"}
             />
             <span>YOU</span>

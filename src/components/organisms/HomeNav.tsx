@@ -12,7 +12,7 @@ const HomeNav = ({ hidden }: Props) => {
   const user = [];
 
   return (
-    <div className="flex justify-between items-center bg-white mobile:max-sm:px-5 px-24 py-3">
+    <div className="flex justify-between items-center fixed w-full shadow-md bg-white mobile:max-sm:px-5 px-24 py-3">
       <Image
         src={"/POCKERPLAY-LOGO copy.png"}
         alt=""
