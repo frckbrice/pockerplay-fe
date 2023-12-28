@@ -9,7 +9,7 @@ export default function Register() {
         <Link href={"/"}>
           <Image
             src={"/POCKERPLAY-LOGO copy.png"}
-            alt="PockerPlay logo"
+            alt="PockerPlay  logo"
             width={200}
             height={100}
           />

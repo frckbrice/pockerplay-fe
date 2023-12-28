@@ -8,10 +8,14 @@ import { userVerification } from "@/utils/service/api-call";
 import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
+import { socket } from "@/utils/service/constant";
+import { Navigate } from "react-router-dom";
+import { useAppContext } from "../Context/AppContext";
 import HomeNav from "@/components/organisms/HomeNav";
 
 export default function Verification() {
   const router = useRouter();
+
   const [userData, setUserData] = useState<User>((): any => {
     if (typeof localStorage !== "undefined") {
       const interval = setInterval(() => {
@@ -31,6 +35,7 @@ export default function Verification() {
       }, 3000);
     }
   });
+  const { currentGame } = useAppContext();
   const userVerification = async () => {
     const googleUser = JSON.parse(
       localStorage.getItem("sb-tpeabveoygvsyymlasnb-auth-token") || "{}"
@@ -47,8 +52,6 @@ export default function Verification() {
   };
 
   useEffect(() => {
-    const currentGame: string = localStorage.getItem("currentGame")!;
-    if (currentGame) router.push(currentGame);
     userVerification();
   }, [router]);
 
@@ -60,8 +63,23 @@ export default function Verification() {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));
       }
     }
+    window.location.href = "";
+    // socket.on("currentGame", (data) => {
+    //   if (data) {
+    //     console.log(data);
+    //     console.log(window.location);
+    //     if (data.current && data.status === "guess_player") {
+    //       setTimeout(() => {
+    //         window.location.hostname = "";
+    //         window.location.replace(data.current);
+    //       }, 1000);
+    //     }
+    //     console.log(window.location);
+    //   }
+    // });
+    if (currentGame) window.location.replace(currentGame);
   })();
-
+  //pockerplay.vercel.app/pockerplay-frontend-cp6ck7vx0-gmarvis.vercel.app/dashboard/ce034f9e-57e7-4f10-ac96-35d87f56edf9
   return (
     <main className="flex min-h-screen ">
       <HomeNav hidden={false} />
@@ -73,20 +91,14 @@ export default function Verification() {
             Welcome To PockerPlay
           </h2>
           <p className="text-gray-500">Excited to have fun?</p>
-          <div className="border border-themecolor mobile:max-sm:border-none flex justify-between mobile:max-sm:flex-col mobile:max-sm:gap-2">
-            <input
-              className="w-full px-2 outline-none mobile:max-sm:mt-5 mobile:max-sm:border mobile:max-sm:border-themecolor mobile:max-sm:py-2"
-              placeholder="Enter your Name"
-            />
-            <button
-              className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
-              onClick={() => {
-                if (userData) router.push("/dashboard");
-              }}
-            >
-              Continue
-            </button>
-          </div>
+          <button
+            className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
+            onClick={() => {
+              if (userData) router.push("http://localhost:3000/dashboard");
+            }}
+          >
+            Continue
+          </button>
         </div>
         <div className="mobile:max-sm:hidden">
           <Image
