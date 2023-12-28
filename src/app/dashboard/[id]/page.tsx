@@ -51,7 +51,13 @@ export default function Page() {
   const params = useParams();
   let i: number = 1;
   useEffect(() => {
-    setGameUrl(`${public_call}/dashboard/${params.id}`);
+
+    if (!Object.keys(homePlayer).length || !homePlayer?.id || homePlayer === undefined) {
+      console.log("no home player");
+      return router.push('/register');
+    } 
+    setGameUrl(`"${public_call}/dashboard/${params.id}"`);
+ 
     if (guessPlayer)
       socket.emit("joingame", {
         gamesession_id: params.id,
@@ -200,10 +206,10 @@ export default function Page() {
 
   // console.log("guessPlayer", guessPlayer);
   // console.log("homePlayer", homePlayer);
-  if (!homePlayer) {
-    console.log("no home player");
-    return router.push(`${public_call}/dashboard/`);
-  } else {
+  // if (!Object.keys(homePlayer).length || !homePlayer?.id || homePlayer === undefined) {
+  //   console.log("no home player");
+  //   return router.push('/register');
+  // } else {
     return (
       <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
         {/* ############ GAME AREA ########### */}
@@ -358,4 +364,4 @@ export default function Page() {
       </main>
     );
   }
-}
+// }

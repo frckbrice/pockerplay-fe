@@ -1,7 +1,7 @@
 "use client";
 
 import supabase from "@/utils/service/supabaseClient";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import { userVerification } from "@/utils/service/api-call";
@@ -10,6 +10,9 @@ import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
 
 export default function Verification() {
+  const currentGame = useRef<any>(null)
+  currentGame.current = typeof localStorage !== "undefined" && localStorage.getItem("currentGame") ? localStorage.getItem("currentGame") : null;
+ console.log(currentGame.current)
   const router = useRouter();
   const [userData, setUserData] = useState<User>((): any => {
     if (typeof localStorage !== "undefined") {
@@ -46,6 +49,7 @@ export default function Verification() {
   };
 
   useEffect(() => {
+    
     userVerification();
   }, []);
 
@@ -58,6 +62,7 @@ export default function Verification() {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));
       }
     }
+    if(currentGame.current) router.push(currentGame.current)
   })();
 
   return (
