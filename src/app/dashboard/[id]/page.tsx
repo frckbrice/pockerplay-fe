@@ -12,6 +12,9 @@ import { api_call } from "@/utils/service/constant";
 import { useParams, useRouter } from "next/navigation";
 
 import { public_call } from "@/utils/service/constant";
+import { useAppContext } from "@/app/Context/AppContext";
+import { Navigate, useNavigate } from "react-router-dom";
+
 export default function Page() {
   const router = useRouter();
   const [generatedData, setGenerataedData] = useState<Array<string>>([]);
@@ -21,7 +24,13 @@ export default function Page() {
     if (typeof localStorage !== "undefined") {
       // console.log("checking made in the entering homplayer");
 
-      return JSON.parse(localStorage.getItem("home_player") || "{}");
+      return (
+        JSON.parse(localStorage.getItem("home_player")!) || {
+          name: "",
+          image: "",
+          email: "",
+        }
+      );
     } else return null;
   });
   const [guessPlayer, setGuessPlayer] = useState<User>(() => {
@@ -47,13 +56,20 @@ export default function Page() {
   const [game, setGame] = useState<GameSession>();
   const [role, setRole] = useState<string>("");
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
-
+  const { setCurrentGame } = useAppContext();
   const params = useParams();
   let i: number = 1;
   useEffect(() => {
-    localStorage.setItem("currentGame", gameUrl);
+    if (
+      !homePlayer?.id ||
+      homePlayer === undefined ||
+      !Object?.keys(homePlayer).length
+    ) {
+      console.log("no home player");
+      return router.push("/register");
+    }
+    setGameUrl(`"${public_call}/dashboard/${params.id}"`);
 
-    setGameUrl(`${public_call}/dashboard/${params.id}`);
     if (guessPlayer)
       socket.emit("joingame", {
         gamesession_id: params.id,
@@ -63,12 +79,26 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-  }, [homePlayer?.id, guessPlayer, params, homePlayer, gameUrl]);
+    if (!Object.keys(homePlayer).length) {
+      socket.emit("currentGame", {
+        current: `"${public_call}/dashboard/${params.id}"`,
+        gamesession_id: params.id,
+        status: "guess_player",
+      });
+      setCurrentGame(`"${public_call}/dashboard/${params.id}"`);
+    }
+  }, [
+    homePlayer?.id,
+    guessPlayer,
+    params,
+    homePlayer,
+    gameUrl,
+    setCurrentGame,
+    router,
+  ]);
 
   socket.on("round", (data) => {
     if (data) {
-      console.log("round: ", data);
-
       setRound(data.round);
       setGenerataedData(data.proposals);
     } else {
@@ -78,7 +108,7 @@ export default function Page() {
 
   socket.on("notify", (data) => {
     if (data) {
-      console.log("notify: ", data);
+      // console.log("notify: ", data);
       if (data.guessPlayer) {
         console.log("guess player connected: ", data);
         if (data.homePlayer.id === homePlayer.id) {
@@ -202,34 +232,30 @@ export default function Page() {
 
   // console.log("guessPlayer", guessPlayer);
   // console.log("homePlayer", homePlayer);
-  if (!homePlayer) {
-    console.log("no home player");
-    return router.push("/register");
-  } else {
-    return (
-      <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
-        {/* ############ GAME AREA ########### */}
-        <div className="py-4 px-8 w-full mobile:max-sm:px-2 mobile:max-sm:h-[calc(100vh-180px)] flex flex-col gap-5">
-          <div className=" flex justify-between w-full">
-            <div className="flex gap-2 mobile:max-sm:h-[4rem] ">
-              <select
-                name="Type"
-                defaultValue="Words"
-                id=""
-                className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
-                // value={category}
-                onChange={(e) => setCategory(e.target.value)}
+  return (
+    <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
+      {/* ############ GAME AREA ########### */}
+      <div className="py-4 px-8 w-full mobile:max-sm:px-2 mobile:max-sm:h-[calc(100vh-180px)] flex flex-col gap-5">
+        <div className=" flex justify-between w-full">
+          <div className="flex gap-2 mobile:max-sm:h-[4rem] ">
+            <select
+              name="Type"
+              defaultValue="Words"
+              id=""
+              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
+              // value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option
+                className="hover:bg-themecolor p-2 focus:bg-themecolor hover:text-white"
+                value="Words"
               >
-                <option
-                  className="hover:bg-themecolor p-2 focus:bg-themecolor hover:text-white"
-                  value="Words"
-                >
-                  Words
-                </option>
-                <option value="Images">Images</option>
-              </select>
+                Words
+              </option>
+              <option value="Images">Images</option>
+            </select>
 
-              {/* <select
+            {/* <select
               name="Type"
               defaultValue="cards"
               id=""
@@ -243,121 +269,120 @@ export default function Page() {
               <option value="birds">birds</option>
             </select> */}
 
-              <select
-                name="Number"
-                defaultValue="5"
-                id=""
-                className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border  w-[4rem] duration-300"
-                // value={numberOfOptions}
-                onChange={(e) => setNumberOfOptions(+e.target.value)}
-              >
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-              </select>
-            </div>
-            <button
-              onClick={handleGenerate}
-              className=" border rounded-md mobile:max-sm:h-[4rem] border-themecolor hover:bg-themecolor hover:text-white transition-all duration-300 text-themecolor p-2"
+            <select
+              name="Number"
+              defaultValue="5"
+              id=""
+              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border  w-[4rem] duration-300"
+              // value={numberOfOptions}
+              onChange={(e) => setNumberOfOptions(+e.target.value)}
             >
-              🃏 Generate
-            </button>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
           </div>
-
-          <div className="flex justify-between items-center w-full">
-            <div className="flex flex-col justify-center items-center w-fit">
-              <Card
-                image={selectedCard}
-                text={selectedCard}
-                className={"w-[80px] h-[80px]"}
-                category={category}
-              />
-              <span className=" w-fit">
-                {homePlayer?.username.split(" ")[0] ?? "You"}
-              </span>
-            </div>
-
-            <div className="flex gap-3 items-center justify-center">
-              <CopyToClipboard text={gameUrl} onCopy={handleCopy}>
-                <button
-                  // onClick={handleCopy}
-                  className="flex gap-1  items-center p-2  text-green-600"
-                >
-                  <span className="text-green-600">
-                    {gameUrl ? gameUrl : "link to share"}
-                  </span>
-                  <PiCopySimpleLight size={20} />
-                </button>
-              </CopyToClipboard>
-            </div>
-
-            <div className="flex flex-col justify-center items-center">
-              <Card
-                image={guessGuess}
-                text={guessGuess}
-                className={"w-[80px] h-[80px] "}
-                category={category}
-              />
-              <span>{guessPlayer?.username?.split(" ")[0] ?? "Guess"}</span>
-            </div>
-          </div>
-          {/* ###### Cards section ##### */}
-          <div className="w-full flex items-center justify-center gap-2 p-2 flex-wrap h-[40vh] bigScreen:h-[60vh] rounded border border-themecolor">
-            {generatedData.map((data, index) => (
-              <Card
-                key={index}
-                image={data}
-                text={data}
-                onClick={() => setSelectedCard(data)}
-                className="w-[100px] h-[100px] bigScreen:w-[250px] bigScreen:h-[250px]"
-                category={category}
-              />
-            ))}
-          </div>
-          {/* ###### Cards section ##### */}
-          <div className=" my-2 py-2 mx-auto">
-            {homePlayer ? guessPlayerHint : guessPlayer ? homeplayerHint : null}
-          </div>
-          <textarea
-            className="h-[10vh] outline-none border border-gray-300 p-2 text-xs"
-            placeholder="enter a hint message..."
-            value={messagehint}
-            onChange={(e) => setMessageHint(e.target.value)}
-          />
           <button
-            className="bg-themecolor text-white p-2"
-            onClick={sendChoiceOrGuess}
+            onClick={handleGenerate}
+            className=" border rounded-md mobile:max-sm:h-[4rem] border-themecolor hover:bg-themecolor hover:text-white transition-all duration-300 text-themecolor p-2"
           >
-            Play
+            🃏 Generate
           </button>
         </div>
 
-        {/* ############ GAME AREA ########### */}
-
-        <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md  h-full px-2 py-4 gap-5">
-          <Scores
-            homePlayer={homePlayer}
-            guessPlayer={guessPlayer}
-            score={score}
-          />
-          <div className="flex border border-themecolor rounded-[5px] p-2 justify-center gap-4 font-extrabold text-themecolor">
-            <span>{`${round?.round_number ? round?.round_number : 1}/5`}</span>
-            <span>Rounds</span>
+        <div className="flex justify-between items-center w-full">
+          <div className="flex flex-col justify-center items-center w-fit">
+            <Card
+              image={selectedCard}
+              text={selectedCard}
+              className={"w-[80px] h-[80px]"}
+              category={category}
+            />
+            <span className=" w-fit">
+              {homePlayer?.username?.split(" ")[0] ?? "You"}
+            </span>
           </div>
 
-          <button
-            className=" border mobile:max-sm:hidden bg-themecolor text-white p-2"
-            onClick={() => {
-              console.log("build insight page");
-            }}
-          >
-            insights
-          </button>
+          <div className="flex gap-3 items-center justify-center">
+            <CopyToClipboard text={gameUrl} onCopy={handleCopy}>
+              <button
+                // onClick={handleCopy}
+                className="flex gap-1  items-center p-2  text-green-600"
+              >
+                <span className="text-green-600">
+                  {gameUrl ? gameUrl : "link to share"}
+                </span>
+                <PiCopySimpleLight size={20} />
+              </button>
+            </CopyToClipboard>
+          </div>
+
+          <div className="flex flex-col justify-center items-center">
+            <Card
+              image={guessGuess}
+              text={guessGuess}
+              className={"w-[80px] h-[80px] "}
+              category={category}
+            />
+            <span>{guessPlayer?.username?.split(" ")[0] ?? "Guess"}</span>
+          </div>
         </div>
-      </main>
-    );
-  }
+        {/* ###### Cards section ##### */}
+        <div className="w-full flex items-center justify-center gap-2 p-2 flex-wrap h-[40vh] bigScreen:h-[60vh] rounded border border-themecolor">
+          {generatedData.map((data, index) => (
+            <Card
+              key={index}
+              image={data}
+              text={data}
+              onClick={() => setSelectedCard(data)}
+              className="w-[100px] h-[100px] bigScreen:w-[250px] bigScreen:h-[250px]"
+              category={category}
+            />
+          ))}
+        </div>
+        {/* ###### Cards section ##### */}
+        <div className=" my-2 py-2 mx-auto">
+          {homePlayer ? guessPlayerHint : guessPlayer ? homeplayerHint : null}
+        </div>
+        <textarea
+          className="h-[10vh] outline-none border border-gray-300 p-2 text-xs"
+          placeholder="enter a hint message..."
+          value={messagehint}
+          onChange={(e) => setMessageHint(e.target.value)}
+        />
+        <button
+          className="bg-themecolor text-white p-2"
+          onClick={sendChoiceOrGuess}
+        >
+          Play
+        </button>
+      </div>
+
+      {/* ############ GAME AREA ########### */}
+
+      <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md  h-full px-2 py-4 gap-5">
+        <Scores
+          homePlayer={homePlayer}
+          guessPlayer={guessPlayer}
+          score={score}
+        />
+        <div className="flex border border-themecolor rounded-[5px] p-2 justify-center gap-4 font-extrabold text-themecolor">
+          <span>{`${round?.round_number ? round?.round_number : 1}/5`}</span>
+          <span>Rounds</span>
+        </div>
+
+        <button
+          className=" border mobile:max-sm:hidden bg-themecolor text-white p-2"
+          onClick={() => {
+            console.log("build insight page");
+          }}
+        >
+          insights
+        </button>
+      </div>
+    </main>
+  );
 }
