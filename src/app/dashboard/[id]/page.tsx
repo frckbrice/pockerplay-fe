@@ -61,10 +61,7 @@ export default function Page() {
   let i: number = 1;
   useEffect(() => {
 
-    if (!Object.keys(homePlayer).length || !homePlayer?.id || homePlayer === undefined) {
-      console.log("no home player");
-      return router.push('/register');
-    } 
+   
     setGameUrl(`"${public_call}/dashboard/${params.id}"`);
  
     if (guessPlayer)
@@ -76,13 +73,17 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-    if (!Object.keys(homePlayer).length) {
+    if ( !homePlayer?.id) {
       socket.emit("currentGame", {
-        current: `"${public_call}/dashboard/${params.id}"`,
+        current: `"/dashboard/${params.id}"`,
         gamesession_id: params.id,
         status: "guess_player",
       });
-      setCurrentGame(`"${public_call}/dashboard/${params.id}"`);
+      setCurrentGame(`"/dashboard/${params.id}"`);
+      if (!Object.keys(homePlayer).length || !homePlayer?.id || homePlayer === undefined) {
+        console.log("no home player");
+        return router.push('/register');
+      } 
     }
   }, [
     homePlayer?.id,
