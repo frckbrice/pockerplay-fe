@@ -5,7 +5,7 @@ import Scores from "@/components/organisms/Scores";
 import { useEffect, useState } from "react";
 // import io from "socket.io-client";
 import { api_call } from "@/utils/service/constant";
-
+import { socket } from "@/utils/service/constant";
 // react icons
 import { PiCopySimpleLight } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -17,6 +17,11 @@ export default function Page() {
   const [generatedData, setGenerataedData] = useState<Array<any>>([]);
   const [gameUrl, setGameUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [homePlayer, setHomePlayer] = useState<User>(() => {
+    if (typeof localStorage !== "undefined") {
+      return JSON.parse(localStorage.getItem("home_player") || "{}");
+    } else return null;
+  });
 
   const handleCopy = () => {
     toast.success("Copied!", {
@@ -27,11 +32,27 @@ export default function Page() {
   };
 
   const createNewGame = () => {
-    setIsLoading((prev) => !prev);
-    setTimeout(() => {
-      router.push("/dashboard/23h232304234h2342342232");
-    }, 500);
+    if (homePlayer) socket.emit("init", { home_player_id: homePlayer.id });
   };
+
+  socket.on("init", (data) => {
+    if (data) {
+      if (data.state === "new game") {
+        toast.success("new game created!", {
+          position: "top-right",
+          hideProgressBar: false,
+          autoClose: 3000,
+        });
+        router.push(`/dashboard/${data.game}`);
+      } else {
+        console.log("data from db", data);
+      }
+    }
+    // setIsLoading((prev) => !prev);
+    // setTimeout(() => {
+    //   router.push("/dashboard/23h232304234h2342342232");
+    // }, 500);
+  });
 
   return (
     <main className="flex justify-center items-center p-4  m-auto">

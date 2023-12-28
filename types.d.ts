@@ -30,7 +30,7 @@ type Round = {
 
 type GameSession = {
   id?: string;
-  home_player_id: string;
+  home_player_id?: string;
   guess_player_id?: string;
   winner: string;
   home_player_score: number;
@@ -40,7 +40,7 @@ type GameSession = {
 };
 
 type Choice = {
-  id?: string;
+  id: string;
   round_id?: string;
   home_player_id: string;
   guess_player_id: string;
@@ -48,9 +48,9 @@ type Choice = {
   guess_player_choice: string;
   home_player_hint: string;
   guess_player_hint: string;
-  user?: User;
-  round?: Round;
-  guess?: Guess;
+  user: User;
+  round: Round;
+  guess: Guess;
 };
 
 type Guess = {
