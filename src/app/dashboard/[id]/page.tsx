@@ -68,7 +68,7 @@ export default function Page() {
       console.log("no home player");
       return router.push("/register");
     }
-    setGameUrl(`"${public_call}/dashboard/${params.id}"`);
+    setGameUrl(`"/dashboard/${params.id}"`);
 
     if (guessPlayer)
       socket.emit("joingame", {
@@ -79,13 +79,13 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-    if (!Object.keys(homePlayer).length) {
+    if (!homePlayer) {
       socket.emit("currentGame", {
         current: `"${public_call}/dashboard/${params.id}"`,
         gamesession_id: params.id,
         status: "guess_player",
       });
-      setCurrentGame(`"${public_call}/dashboard/${params.id}"`);
+      setCurrentGame(`"/dashboard/${params.id}"`);
     }
   }, [
     homePlayer?.id,
