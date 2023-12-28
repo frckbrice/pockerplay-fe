@@ -29,7 +29,7 @@ export default function Home() {
           />
           <Link
             className=" bg-lightPupple p-4 w-[150px] mobile:max-sm:w-full text-center font-bold text-white"
-            href={"/register"}
+            href={"/verification"}
           >
             GET STARTED
           </Link>

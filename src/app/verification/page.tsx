@@ -8,6 +8,7 @@ import { userVerification } from "@/utils/service/api-call";
 import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
+import HomeNav from "@/components/organisms/HomeNav";
 
 export default function Verification() {
   const router = useRouter();
@@ -46,13 +47,14 @@ export default function Verification() {
   };
 
   useEffect(() => {
+    const currentGame: string = localStorage.getItem("currentGame")!;
+    if (currentGame) router.push(currentGame);
     userVerification();
-  }, []);
-
-  console.log("googleData", userData);
+  }, [router]);
 
   (async function () {
     if (userData) {
+      console.log("googleData", userData);
       const user = await signupFn(userData as User);
       if (user) {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));
@@ -61,28 +63,30 @@ export default function Verification() {
   })();
 
   return (
-    <main className="">
-      <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw]  w-[80vw] h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
+    <main className="flex min-h-screen ">
+      <HomeNav hidden={false} />
+
+      <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw] px-24  w-full h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
         <div className="">
-          <p className="text-gray-500">
-            {userData?.username ? (
-              `Hey ${userData?.username} 👋`
-            ) : (
-              <RoundLoader />
-            )}
-          </p>
+          <p className="text-gray-500"></p>
           <h2 className="text-[40px] font-bold text-themecolor bigScreen:text-[60px]  mobile:max-sm:w-full ">
             Welcome To PockerPlay
           </h2>
           <p className="text-gray-500">Excited to have fun?</p>
-          <button
-            className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
-            onClick={() => {
-              if (userData) router.push("/dashboard");
-            }}
-          >
-            Continue
-          </button>
+          <form className="border border-themecolor mobile:max-sm:border-none flex justify-between mobile:max-sm:flex-col mobile:max-sm:gap-2">
+            <input
+              className="w-full px-2 outline-none mobile:max-sm:mt-5 mobile:max-sm:border mobile:max-sm:border-themecolor mobile:max-sm:py-2"
+              placeholder="Enter your Name"
+            />
+            <button
+              className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
+              onClick={() => {
+                if (userData) router.push("/dashboard");
+              }}
+            >
+              Continue
+            </button>
+          </form>
         </div>
         <div className="mobile:max-sm:hidden">
           <Image

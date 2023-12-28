@@ -26,8 +26,6 @@ export default function GoogleSignUpBtn() {
         redirectTo: urlToUse(),
       },
     });
-    if (data) console.log("data from supabase", data);
-    if (error) console.log("error from supabase", error);
   };
 
   return (

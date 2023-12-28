@@ -51,6 +51,8 @@ export default function Page() {
   const params = useParams();
   let i: number = 1;
   useEffect(() => {
+    localStorage.setItem("currentGame", gameUrl);
+
     setGameUrl(`${public_call}/dashboard/${params.id}`);
     if (guessPlayer)
       socket.emit("joingame", {
@@ -61,7 +63,7 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-  }, [homePlayer?.id, guessPlayer, params, homePlayer, router]);
+  }, [homePlayer?.id, guessPlayer, params, homePlayer, gameUrl]);
 
   socket.on(
     "round",
