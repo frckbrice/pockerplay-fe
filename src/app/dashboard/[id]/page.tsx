@@ -117,7 +117,7 @@ export default function Page() {
       }
     }
   });
-
+  console.log(role);
   socket.on(
     "notify",
     (data: {
@@ -135,6 +135,8 @@ export default function Page() {
               "guess_player",
               JSON.stringify(data.guessPlayer)
             );
+            setRole(data.role);
+            localStorage.setItem("status", role);
           } else if (data.role === "guess_player") {
             localStorage.setItem(
               "home_player",
@@ -144,10 +146,10 @@ export default function Page() {
               "guess_player",
               JSON.stringify(data.homePlayer)
             );
+            setRole(data.role);
+            localStorage.setItem("status", data.role);
           }
         }
-        setRole(data.role);
-        localStorage.setItem("status", role);
       }
     }
   );
@@ -179,28 +181,20 @@ export default function Page() {
       console.log("check game state", data?.gameState);
     }
   });
-  socket.on(
-    "receive_choice",
-    (data: {
-      role: string;
-      proposals: SetStateAction<string[]>;
-      message: SetStateAction<string>;
-      choice: SetStateAction<string>;
-    }) => {
-      if (data) {
-        console.log("receive_choice: ", data);
-        if (data.role === "home_player") {
-          setGenerataedData(data.proposals);
-          setGuessPlayerHint(data.message);
-        } else if (data.role === "guess_player") {
-          setGenerataedData(data.proposals);
-          setHomePlayerHint(data.message);
-        }
-        setChoiceMadeId(data.choice);
+  socket.on("receive_choice", (data) => {
+    if (data) {
+      console.log("receive_choice: ", data);
+      if (data.role === "home_player") {
+        setGenerataedData(data.proposals);
+        setGuessPlayerHint(data.message);
+      } else if (data.role === "guess_player") {
+        setGenerataedData(data.proposals);
+        setHomePlayerHint(data.message);
       }
-      setChoiceReceived(true);
+      setChoiceMadeId(data.choice);
     }
-  );
+    setChoiceReceived(true);
+  });
   const sendChoiceOrGuess = () => {
     const choiceData = {
       gamesession_id: params.id,
@@ -208,7 +202,7 @@ export default function Page() {
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
-      role: role,
+      role: localStorage.getItem("status") || "",
       player_id: guessPlayer
         ? guessPlayer.id
         : homePlayer
@@ -225,7 +219,7 @@ export default function Page() {
         : homePlayer
         ? homePlayer.id
         : undefined,
-      role: role,
+      role: localStorage.getItem("status") || "",
       gamesession_id: params.id,
     };
 
@@ -250,26 +244,18 @@ export default function Page() {
       autoClose: 3000,
     });
   };
-  socket.on(
-    "endGame",
-    (data: {
-      role: string;
-      guess: SetStateAction<string>;
-      gameState: string;
-      game: SetStateAction<GameSession | undefined>;
-    }) => {
-      console.log("endGame: ", data);
-      if (data) {
-        if (data.role === "home_player") {
-          setHomeGuess(data.guess);
-        } else if (data.role === "guess_player") {
-          setGuessGuess(data.guess);
-        }
-        if (data.gameState === "END") alert("the game is finish! retry...");
-        setGame(data.game);
+  socket.on("endGame", (data) => {
+    console.log("endGame: ", data);
+    if (data) {
+      if (data.role === "home_player") {
+        setHomeGuess(data.guess);
+      } else if (data.role === "guess_player") {
+        setGuessGuess(data.guess);
       }
+      if (data.gameState === "END") alert("the game is finish! retry...");
+      setGame(data.game);
     }
-  );
+  });
 
   // console.log("guessPlayer", guessPlayer);
   // console.log("homePlayer", homePlayer);
@@ -395,7 +381,7 @@ export default function Page() {
           onChange={(e) => setMessageHint(e.target.value)}
         />
         <button
-          className="bg-themecolor text-white p-2"
+          className="bg-themecolor text-white p-2 cursor-pointer"
           onClick={sendChoiceOrGuess}
         >
           Play
