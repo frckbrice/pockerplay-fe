@@ -46,13 +46,14 @@ export default function Verification() {
   };
 
   useEffect(() => {
+    const currentGame: string = localStorage.getItem("currentGame")!;
+    if (currentGame) router.push(currentGame);
     userVerification();
-  }, []);
-
-  console.log("googleData", userData);
+  }, [router]);
 
   (async function () {
     if (userData) {
+      console.log("googleData", userData);
       const user = await signupFn(userData as User);
       if (user) {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));

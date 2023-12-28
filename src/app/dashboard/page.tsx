@@ -1,21 +1,15 @@
 "use client";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import Card from "@/components/atoms/Card";
-import Scores from "@/components/organisms/Scores";
-import { useEffect, useState } from "react";
-// import io from "socket.io-client";
-import { api_call } from "@/utils/service/constant";
+
+import { useState } from "react";
+
 import { socket } from "@/utils/service/constant";
-// react icons
-import { PiCopySimpleLight } from "react-icons/pi";
+
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import RoundLoader from "@/components/atoms/RoundLoader";
 
 export default function Page() {
   const router = useRouter();
-  const [generatedData, setGenerataedData] = useState<Array<any>>([]);
-  const [gameUrl, setGameUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [homePlayer, setHomePlayer] = useState<User>(() => {
     if (typeof localStorage !== "undefined") {
