@@ -1,115 +1,88 @@
 "use client";
 
 import supabase from "@/utils/service/supabaseClient";
-import React, { useEffect, useRef } from "react";
+import React, { FormEvent, useEffect } from "react";
 import { useState } from "react";
 import Image from "next/image";
-import { userVerification } from "@/utils/service/api-call";
+
 import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
-import { socket } from "@/utils/service/constant";
-<<<<<<< HEAD
 
-=======
-import { Navigate } from "react-router-dom";
+
+
+
 import { useAppContext } from "../Context/AppContext";
->>>>>>> 071a93978727e647e4f7f02346bdb16da85f1e9c
+
+import HomeNav from "@/components/organisms/HomeNav";
+
 
 export default function Verification() {
-  const currentGame = useRef<any>(null)
-  currentGame.current = typeof localStorage !== "undefined" && localStorage.getItem("currentGame") ? localStorage.getItem("currentGame") : null;
- console.log(currentGame.current)
-  const router = useRouter();
+ 
 
-  const [userData, setUserData] = useState<User>((): any => {
+  const router = useRouter();
+  const [name, setName] = useState<string>("");
+  const [userData, setUserData] = useState<Partial<User>>();
+  const [currentGame] = useState<string>(() => {
     if (typeof localStorage !== "undefined") {
-      const interval = setInterval(() => {
-        const googleUser = JSON.parse(
-          localStorage.getItem("sb-tpeabveoygvsyymlasnb-auth-token") || "{}"
-        );
-        let set: boolean = false;
-        if (googleUser.user) {
-          set = true;
-          setUserData({
-            username: googleUser?.user.user_metadata.name,
-            email: googleUser?.user.email,
-            image: googleUser?.user.user_metadata.picture,
-          });
-        }
-        if (set) clearInterval(interval);
-      }, 3000);
-    }
+      return JSON.parse(localStorage.getItem("currentGameSession")!) || "";
+    } else return null;
   });
-  const { currentGame } = useAppContext();
-  const userVerification = async () => {
-    const googleUser = JSON.parse(
-      localStorage.getItem("sb-tpeabveoygvsyymlasnb-auth-token") || "{}"
-    );
-    await supabase.from("user").select("email");
-    if (googleUser.user) {
-      const values = {
-        username: googleUser?.user.user_metadata.name,
-        email: googleUser?.user.email,
-        image: googleUser?.user.user_metadata.picture,
-      };
-      setUserData(values);
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (name) {
+      const data = { username: name };
+      console.log("data", data);
+      const user = await signupFn(data);
+      if (user) {
+        console.log(user);
+        setUserData(user);
+        localStorage.setItem("home_player", JSON.stringify(user));
+        if (currentGame) {
+          router.push(`/dashboard/${currentGame}`);
+        }
+      }
     }
   };
 
-  useEffect(() => {
-    
-    userVerification();
-  }, [router]);
-
-  (async function () {
-    if (userData) {
-      console.log("googleData", userData);
-      const user = await signupFn(userData as User);
-      if (user) {
-        if (user) localStorage.setItem("home_player", JSON.stringify(user));
-      }
+  const handleKeyDown = async (event: any) => {
+    if (event.key === "Enter") {
+      await submit(event);
     }
-    window.location.href = "";
-    // socket.on("currentGame", (data) => {
-    //   if (data) {
-    //     console.log(data);
-    //     console.log(window.location);
-    //     if (data.current && data.status === "guess_player") {
-    //       setTimeout(() => {
-    //         window.location.hostname = "";
-    //         window.location.replace(data.current);
-    //       }, 1000);
-    //     }
-    //     console.log(window.location);
-    //   }
-    // });
-    if (currentGame) window.location.replace(currentGame);
-  })();
-  //pockerplay.vercel.app/pockerplay-frontend-cp6ck7vx0-gmarvis.vercel.app/dashboard/ce034f9e-57e7-4f10-ac96-35d87f56edf9
+  };
+
   return (
-    <main className="">
-      <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw]  w-[80vw] h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
+    <main className="flex min-h-screen ">
+      <HomeNav hidden={false} />
+
+      <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw] px-24  w-full h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
         <div className="">
-          <p className="text-gray-500">
-            {userData?.username ? (
-              `Hey ${userData?.username} 👋`
-            ) : (
-              <RoundLoader />
-            )}
-          </p>
+          <p className="text-gray-500"></p>
           <h2 className="text-[40px] font-bold text-themecolor bigScreen:text-[60px]  mobile:max-sm:w-full ">
             Welcome To PockerPlay
           </h2>
           <p className="text-gray-500">Excited to have fun?</p>
-          <button
-            className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
-            onClick={() => {
-              if (userData) router.push("http://localhost:3000/dashboard");
-            }}
+          <form
+            className="border border-themecolor mobile:max-sm:border-none flex justify-between mobile:max-sm:flex-col mobile:max-sm:gap-2"
+            onSubmit={submit}
           >
-            Continue
-          </button>
+            <input
+              className="w-full px-2 outline-none mobile:max-sm:mt-5 mobile:max-sm:border mobile:max-sm:border-themecolor mobile:max-sm:py-2"
+              placeholder="Enter your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <button
+              className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
+              onClick={() => {
+                if (userData) router.push("/dashboard");
+              }}
+              onKeyDown={handleKeyDown}
+            >
+              Continue
+            </button>
+          </form>
         </div>
         <div className="mobile:max-sm:hidden">
           <Image

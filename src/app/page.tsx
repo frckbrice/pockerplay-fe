@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col gap-2 bg-[#f1f1f1]">
       <HomeNav hidden={false} />
-      <div className="flex px-24 mobile:max-sm:flex-col justify-between items-center mobile:max-sm:px-5">
+      <div className="flex px-24 mobile:max-sm:flex-col mt-20 justify-between items-center mobile:max-sm:px-5">
         <div className="w-[50vw] mobile:max-sm:w-full mobile:max-sm:justify-center mobile:max-sm:items-center flex flex-col gap-2">
           <h2 className="text-[40px] mobile:max-sm:text-[30px] mobile:max-sm:text-center bigScreen:text-[70px] font-bold text-themecolor">
             The Thrill of Guessing Games in Real-Time
@@ -29,7 +29,7 @@ export default function Home() {
           />
           <Link
             className=" bg-lightPupple p-4 w-[150px] mobile:max-sm:w-full text-center font-bold text-white"
-            href={"/register"}
+            href={"/verification"}
           >
             GET STARTED
           </Link>
@@ -52,7 +52,7 @@ export default function Home() {
           />
         </div>
       </div>
-      <div className="flex px-24 gap-10 justify-between items-center mobile:max-sm:w-full mobile:max-sm:px-2">
+      <div className="flex px-24 gap-10 justify-between bg-white items-center mobile:max-sm:w-full mobile:max-sm:px-2">
         <div className="mobile:max-sm:hidden">
           <Image
             src={"/runningman.png"}

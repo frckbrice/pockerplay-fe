@@ -2,7 +2,7 @@
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Card from "@/components/atoms/Card";
 import Scores from "@/components/organisms/Scores";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
 // react icons
 import { PiCopySimpleLight } from "react-icons/pi";
@@ -60,18 +60,14 @@ export default function Page() {
   const params = useParams();
   let i: number = 1;
   useEffect(() => {
-<<<<<<< HEAD
-=======
     if (
       !homePlayer?.id ||
       homePlayer === undefined ||
       !Object?.keys(homePlayer).length
     ) {
       console.log("no home player");
-      return router.push("/register");
+      return router.push("/verification");
     }
-    setGameUrl(`"/dashboard/${params.id}"`);
->>>>>>> 071a93978727e647e4f7f02346bdb16da85f1e9c
 
    
     setGameUrl(`"${public_call}/dashboard/${params.id}"`);
@@ -85,25 +81,9 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-<<<<<<< HEAD
-    if ( !homePlayer?.id) {
-=======
-    if (!homePlayer) {
->>>>>>> 071a93978727e647e4f7f02346bdb16da85f1e9c
-      socket.emit("currentGame", {
-        current: `"/dashboard/${params.id}"`,
-        gamesession_id: params.id,
-        status: "guess_player",
-      });
-      setCurrentGame(`"/dashboard/${params.id}"`);
-<<<<<<< HEAD
-      if (!Object.keys(homePlayer).length || !homePlayer?.id || homePlayer === undefined) {
-        console.log("no home player");
-        return router.push('/register');
-      } 
-=======
->>>>>>> 071a93978727e647e4f7f02346bdb16da85f1e9c
-    }
+
+    localStorage.setItem("currentGameSession", JSON.stringify(params.id));
+
   }, [
     homePlayer?.id,
     guessPlayer,
@@ -139,11 +119,45 @@ export default function Page() {
           localStorage.setItem("guess_player", JSON.stringify(data.homePlayer));
         }
       }
-      setRole(data.role);
-      localStorage.setItem("status", role);
     }
   });
-  // console.log("guess player: ", guessPlayer);
+  console.log(role);
+  socket.on(
+    "notify",
+    (data: {
+      guessPlayer: any;
+      homePlayer: { id: string | undefined };
+      role: SetStateAction<string>;
+    }) => {
+      if (data) {
+        console.log("notify: ", data);
+        if (data.guessPlayer) {
+          console.log("guess player connected: ", data);
+          if (data.homePlayer.id === homePlayer.id) {
+            console.log("i am the home player");
+            localStorage.setItem(
+              "guess_player",
+              JSON.stringify(data.guessPlayer)
+            );
+            setRole(data.role);
+            localStorage.setItem("status", role);
+          } else if (data.role === "guess_player") {
+            localStorage.setItem(
+              "home_player",
+              JSON.stringify(data.guessPlayer)
+            );
+            localStorage.setItem(
+              "guess_player",
+              JSON.stringify(data.homePlayer)
+            );
+            setRole(data.role);
+            localStorage.setItem("status", data.role);
+          }
+        }
+      }
+    }
+  );
+
   const handleGenerate = () => {
     const data = {
       home_player_id: homePlayer.id,
@@ -192,7 +206,7 @@ export default function Page() {
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
-      role: role,
+      role: localStorage.getItem("status") || "",
       player_id: guessPlayer
         ? guessPlayer.id
         : homePlayer
@@ -209,7 +223,7 @@ export default function Page() {
         : homePlayer
         ? homePlayer.id
         : undefined,
-      role: role,
+      role: localStorage.getItem("status") || "",
       gamesession_id: params.id,
     };
 
@@ -221,7 +235,7 @@ export default function Page() {
       socket.emit("send_guess", guessData);
     }
   };
-  socket.on("myDM", (data) => {
+  socket.on("myDM", (data: string | any[]) => {
     if (data.length) {
       console.log("my dm ", data);
       localStorage.setItem("myDM", JSON.stringify(data));
@@ -371,7 +385,7 @@ export default function Page() {
           onChange={(e) => setMessageHint(e.target.value)}
         />
         <button
-          className="bg-themecolor text-white p-2"
+          className="bg-themecolor text-white p-2 cursor-pointer"
           onClick={sendChoiceOrGuess}
         >
           Play
