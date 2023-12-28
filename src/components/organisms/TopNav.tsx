@@ -9,6 +9,7 @@ export default function TopNav({ onClick }: Props) {
   if (typeof localStorage === "undefined") return;
   const homePlayer = JSON.parse(localStorage.getItem("home_player") || "{}");
   const status = localStorage.getItem("status");
+  console.log(status);
   return (
     <div>
       <nav className="flex items-center bg-white w-full justify-between border-b px-2 py-1 border-gray-200">

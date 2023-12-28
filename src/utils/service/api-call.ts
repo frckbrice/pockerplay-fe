@@ -2,8 +2,7 @@ import { api_call } from "./constant";
 import supabase from "./supabaseClient";
 
 export const signupFn = async (user: User): Promise<User | null> => {
-  console.log("api call user from api", user);
-  console.log(api_call);
+  console.log("api address: ", api_call);
   const apiUser = await fetch(api_call + "/users", {
     method: "POST",
     body: JSON.stringify(user),

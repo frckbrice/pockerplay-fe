@@ -8,6 +8,8 @@ import { userVerification } from "@/utils/service/api-call";
 import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
+import { socket } from "@/utils/service/constant";
+
 
 export default function Verification() {
   const currentGame = useRef<any>(null)
@@ -51,21 +53,34 @@ export default function Verification() {
   useEffect(() => {
     
     userVerification();
-  }, []);
-
-  console.log("googleData", userData);
+  }, [router]);
 
   (async function () {
     if (userData) {
+      console.log("googleData", userData);
       const user = await signupFn(userData as User);
       if (user) {
         if (user) localStorage.setItem("home_player", JSON.stringify(user));
       }
     }
-    if(currentGame.current) router.push(currentGame.current)
+    window.location.href = "";
+    socket.on("currentGame", (data) => {
+      if (data) {
+        console.log(data);
+        console.log(window.location);
+        if (data.current && data.status === "guess_player") {
+          setTimeout(() => {
+            // return <Navigate to={data.current} replace></Navigate>;
+            window.location.hostname = "";
+            window.location.replace(data.current);
+          }, 1000);
+        }
+        console.log(window.location);
+      }
+    });
   })();
-
-  return (
+  //pockerplay.vercel.app/pockerplay-frontend-cp6ck7vx0-gmarvis.vercel.app/dashboard/ce034f9e-57e7-4f10-ac96-35d87f56edf9
+  https: return (
     <main className="">
       <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw]  w-[80vw] h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
         <div className="">
@@ -83,7 +98,7 @@ export default function Verification() {
           <button
             className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
             onClick={() => {
-              if (userData) router.push("/dashboard");
+              if (userData) router.push("http://localhost:3000/dashboard");
             }}
           >
             Continue
