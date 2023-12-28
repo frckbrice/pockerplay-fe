@@ -73,7 +73,7 @@ export default function Verification() {
             Welcome To PockerPlay
           </h2>
           <p className="text-gray-500">Excited to have fun?</p>
-          <form className="border border-themecolor mobile:max-sm:border-none flex justify-between mobile:max-sm:flex-col mobile:max-sm:gap-2">
+          <div className="border border-themecolor mobile:max-sm:border-none flex justify-between mobile:max-sm:flex-col mobile:max-sm:gap-2">
             <input
               className="w-full px-2 outline-none mobile:max-sm:mt-5 mobile:max-sm:border mobile:max-sm:border-themecolor mobile:max-sm:py-2"
               placeholder="Enter your Name"
@@ -86,7 +86,7 @@ export default function Verification() {
             >
               Continue
             </button>
-          </form>
+          </div>
         </div>
         <div className="mobile:max-sm:hidden">
           <Image
