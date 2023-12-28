@@ -66,9 +66,9 @@ export default function Page() {
       !Object?.keys(homePlayer).length
     ) {
       console.log("no home player");
-      return router.push("/register");
+      return router.push("/verification");
     }
-    setGameUrl(`"/dashboard/${params.id}"`);
+    setGameUrl(`${public_call}/dashboard/${params.id}`);
 
     if (guessPlayer)
       socket.emit("joingame", {
@@ -79,14 +79,7 @@ export default function Page() {
       id: homePlayer?.id,
       gamesession_id: params.id,
     });
-    if (!homePlayer) {
-      socket.emit("currentGame", {
-        current: `"${public_call}/dashboard/${params.id}"`,
-        gamesession_id: params.id,
-        status: "guess_player",
-      });
-      setCurrentGame(`"/dashboard/${params.id}"`);
-    }
+    localStorage.setItem("currentGameSession", JSON.stringify(params.id));
   }, [
     homePlayer?.id,
     guessPlayer,
@@ -123,8 +116,8 @@ export default function Page() {
         }
       }
     }
-  );
-
+  });
+  console.log(role);
   socket.on(
     "notify",
     (data: {
@@ -142,6 +135,8 @@ export default function Page() {
               "guess_player",
               JSON.stringify(data.guessPlayer)
             );
+            setRole(data.role);
+            localStorage.setItem("status", role);
           } else if (data.role === "guess_player") {
             localStorage.setItem(
               "home_player",
@@ -151,14 +146,14 @@ export default function Page() {
               "guess_player",
               JSON.stringify(data.homePlayer)
             );
+            setRole(data.role);
+            localStorage.setItem("status", data.role);
           }
         }
-        setRole(data.role);
-        localStorage.setItem("status", role);
       }
     }
   );
-  // console.log("guess player: ", guessPlayer);
+
   const handleGenerate = () => {
     const data = {
       home_player_id: homePlayer.id,
@@ -174,48 +169,32 @@ export default function Page() {
     }
     socket.emit("generate", data);
   };
-  socket.on(
-    "receive_guess",
-    (data: {
-      role: string;
-      guess: SetStateAction<string>;
-      score: SetStateAction<Score | undefined>;
-      gameState: any;
-    }) => {
-      if (data) {
-        console.log("receive_guess: ", data);
-        if (data.role === "home_player") {
-          setHomeGuess(data.guess);
-        } else if (data.role === "guess_player") {
-          setGuessGuess(data.guess);
-        }
-        setScore(data.score);
-        console.log("check game state", data?.gameState);
+  socket.on("receive_guess", (data) => {
+    if (data) {
+      console.log("receive_guess: ", data);
+      if (data.role === "home_player") {
+        setHomeGuess(data.guess);
+      } else if (data.role === "guess_player") {
+        setGuessGuess(data.guess);
       }
+      setScore(data.score);
+      console.log("check game state", data?.gameState);
     }
-  );
-  socket.on(
-    "receive_choice",
-    (data: {
-      role: string;
-      proposals: SetStateAction<string[]>;
-      message: SetStateAction<string>;
-      choice: SetStateAction<string>;
-    }) => {
-      if (data) {
-        console.log("receive_choice: ", data);
-        if (data.role === "home_player") {
-          setGenerataedData(data.proposals);
-          setGuessPlayerHint(data.message);
-        } else if (data.role === "guess_player") {
-          setGenerataedData(data.proposals);
-          setHomePlayerHint(data.message);
-        }
-        setChoiceMadeId(data.choice);
+  });
+  socket.on("receive_choice", (data) => {
+    if (data) {
+      console.log("receive_choice: ", data);
+      if (data.role === "home_player") {
+        setGenerataedData(data.proposals);
+        setGuessPlayerHint(data.message);
+      } else if (data.role === "guess_player") {
+        setGenerataedData(data.proposals);
+        setHomePlayerHint(data.message);
       }
-      setChoiceReceived(true);
+      setChoiceMadeId(data.choice);
     }
-  );
+    setChoiceReceived(true);
+  });
   const sendChoiceOrGuess = () => {
     const choiceData = {
       gamesession_id: params.id,
@@ -223,7 +202,7 @@ export default function Page() {
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
-      role: role,
+      role: localStorage.getItem("status") || "",
       player_id: guessPlayer
         ? guessPlayer.id
         : homePlayer
@@ -240,7 +219,7 @@ export default function Page() {
         : homePlayer
         ? homePlayer.id
         : undefined,
-      role: role,
+      role: localStorage.getItem("status") || "",
       gamesession_id: params.id,
     };
 
@@ -265,26 +244,18 @@ export default function Page() {
       autoClose: 3000,
     });
   };
-  socket.on(
-    "endGame",
-    (data: {
-      role: string;
-      guess: SetStateAction<string>;
-      gameState: string;
-      game: SetStateAction<GameSession | undefined>;
-    }) => {
-      console.log("endGame: ", data);
-      if (data) {
-        if (data.role === "home_player") {
-          setHomeGuess(data.guess);
-        } else if (data.role === "guess_player") {
-          setGuessGuess(data.guess);
-        }
-        if (data.gameState === "END") alert("the game is finish! retry...");
-        setGame(data.game);
+  socket.on("endGame", (data) => {
+    console.log("endGame: ", data);
+    if (data) {
+      if (data.role === "home_player") {
+        setHomeGuess(data.guess);
+      } else if (data.role === "guess_player") {
+        setGuessGuess(data.guess);
       }
+      if (data.gameState === "END") alert("the game is finish! retry...");
+      setGame(data.game);
     }
-  );
+  });
 
   // console.log("guessPlayer", guessPlayer);
   // console.log("homePlayer", homePlayer);
@@ -410,7 +381,7 @@ export default function Page() {
           onChange={(e) => setMessageHint(e.target.value)}
         />
         <button
-          className="bg-themecolor text-white p-2"
+          className="bg-themecolor text-white p-2 cursor-pointer"
           onClick={sendChoiceOrGuess}
         >
           Play

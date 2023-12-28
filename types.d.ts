@@ -1,8 +1,8 @@
 type User = {
   id?: string;
   username: string;
-  email: string;
-  image: string;
+  email?: string;
+  image?: string;
   games?: GameSession[];
 };
 type CardType = {

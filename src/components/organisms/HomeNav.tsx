@@ -7,9 +7,18 @@ type Props = {
   hidden: boolean;
 };
 
+const user = {
+  name: "",
+  image: "",
+  email: "",
+};
+
 const HomeNav = ({ hidden }: Props) => {
-  const user = localStorage.getItem("userData") || [];
-  // const user = [];
+  const [homePlayer, setHomePlayer] = useState<User>(() => {
+    if (typeof localStorage !== "undefined") {
+      return JSON.parse(localStorage.getItem("home_player")!) || user;
+    } else return null;
+  });
 
   return (
     <div className="flex justify-between h-[10vh] items-center fixed w-full shadow-md bg-white mobile:max-sm:px-5 px-24 py-3">
@@ -19,7 +28,7 @@ const HomeNav = ({ hidden }: Props) => {
         width={200}
         height={100}
       />
-      {!user.length ? (
+      {!homePlayer?.id ? (
         <Link
           href={"/verification"}
           className={`border ${

@@ -8,6 +8,7 @@ type Props = {
 export default function TopNav({ onClick }: Props) {
   if (typeof localStorage === "undefined") return;
   const homePlayer = JSON.parse(localStorage.getItem("home_player") || "{}");
+  const guessPlayer = JSON.parse(localStorage.getItem("guess_player") || "{}");
   const status = localStorage.getItem("status");
   console.log(status);
   return (
