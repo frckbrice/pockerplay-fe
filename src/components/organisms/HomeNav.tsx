@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -8,7 +8,7 @@ type Props = {
 };
 
 const HomeNav = ({ hidden }: Props) => {
-  const [user, setUser] = useState(localStorage.getItem("userData") || []);
+  const user = localStorage.getItem("userData") || [];
   // const user = [];
 
   return (

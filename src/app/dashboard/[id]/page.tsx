@@ -247,7 +247,7 @@ export default function Page() {
   // console.log("homePlayer", homePlayer);
   if (!homePlayer) {
     console.log("no home player");
-    return router.push("/verification");
+    // return router.push("/verification");
   } else {
     return (
       <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
