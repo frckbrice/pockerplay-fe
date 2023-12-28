@@ -9,13 +9,19 @@ import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
 import { socket } from "@/utils/service/constant";
+<<<<<<< HEAD
 
+=======
+import { Navigate } from "react-router-dom";
+import { useAppContext } from "../Context/AppContext";
+>>>>>>> 071a93978727e647e4f7f02346bdb16da85f1e9c
 
 export default function Verification() {
   const currentGame = useRef<any>(null)
   currentGame.current = typeof localStorage !== "undefined" && localStorage.getItem("currentGame") ? localStorage.getItem("currentGame") : null;
  console.log(currentGame.current)
   const router = useRouter();
+
   const [userData, setUserData] = useState<User>((): any => {
     if (typeof localStorage !== "undefined") {
       const interval = setInterval(() => {
@@ -35,6 +41,7 @@ export default function Verification() {
       }, 3000);
     }
   });
+  const { currentGame } = useAppContext();
   const userVerification = async () => {
     const googleUser = JSON.parse(
       localStorage.getItem("sb-tpeabveoygvsyymlasnb-auth-token") || "{}"
@@ -64,23 +71,23 @@ export default function Verification() {
       }
     }
     window.location.href = "";
-    socket.on("currentGame", (data) => {
-      if (data) {
-        console.log(data);
-        console.log(window.location);
-        if (data.current && data.status === "guess_player") {
-          setTimeout(() => {
-            // return <Navigate to={data.current} replace></Navigate>;
-            window.location.hostname = "";
-            window.location.replace(data.current);
-          }, 1000);
-        }
-        console.log(window.location);
-      }
-    });
+    // socket.on("currentGame", (data) => {
+    //   if (data) {
+    //     console.log(data);
+    //     console.log(window.location);
+    //     if (data.current && data.status === "guess_player") {
+    //       setTimeout(() => {
+    //         window.location.hostname = "";
+    //         window.location.replace(data.current);
+    //       }, 1000);
+    //     }
+    //     console.log(window.location);
+    //   }
+    // });
+    if (currentGame) window.location.replace(currentGame);
   })();
   //pockerplay.vercel.app/pockerplay-frontend-cp6ck7vx0-gmarvis.vercel.app/dashboard/ce034f9e-57e7-4f10-ac96-35d87f56edf9
-  https: return (
+  return (
     <main className="">
       <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw]  w-[80vw] h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
         <div className="">
