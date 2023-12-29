@@ -18,7 +18,7 @@ import { useParams, useRouter } from "next/navigation";
 import { public_call } from "@/utils/service/constant";
 import { useAppContext } from "@/app/Context/AppContext";
 import Copy from "@/components/organisms/Copy";
-import { Navigate, useNavigate } from "react-router-dom";
+
 import Popups from "@/components/atoms/Popups";
 import Overlay from "@/components/atoms/Overlay";
 
