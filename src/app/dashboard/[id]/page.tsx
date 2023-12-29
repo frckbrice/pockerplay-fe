@@ -5,6 +5,10 @@ import Scores from "@/components/organisms/Scores";
 import { SetStateAction, useEffect, useState } from "react";
 
 // react icons
+import { FaCheck } from "react-icons/fa";
+import { GrClose } from "react-icons/gr";
+import { FcCloseUpMode } from "react-icons/fc";
+
 import { PiCopySimpleLight } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { socket } from "@/utils/service/constant";
@@ -13,7 +17,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { public_call } from "@/utils/service/constant";
 import { useAppContext } from "@/app/Context/AppContext";
-import { Navigate, useNavigate } from "react-router-dom";
+import Copy from "@/components/organisms/Copy";
 
 export default function Page() {
   const router = useRouter();
@@ -22,8 +26,6 @@ export default function Page() {
   const [score, setScore] = useState<Score>();
   const [homePlayer, setHomePlayer] = useState<User>(() => {
     if (typeof localStorage !== "undefined") {
-      // console.log("checking made in the entering homplayer");
-
       return (
         JSON.parse(localStorage.getItem("home_player")!) || {
           name: "",
@@ -35,7 +37,6 @@ export default function Page() {
   });
   const [guessPlayer, setGuessPlayer] = useState<User>(() => {
     if (typeof localStorage !== "undefined") {
-      // console.log("checking made in the entering guessplayer");
       if (localStorage.getItem("guess_player") !== "undefined")
         return JSON.parse(localStorage.getItem("guess_player") || "{}");
     } else return null;
@@ -68,27 +69,24 @@ export default function Page() {
       console.log("no home player");
       return router.push("/verification");
     }
-    setGameUrl(`${public_call}/dashboard/${params.id}`);
 
-    if (guessPlayer)
+    // console.log(guessGuess);
+    setGameUrl(`"${public_call}/dashboard/${params.id}"`);
+
+    if (homePlayer) {
       socket.emit("joingame", {
         gamesession_id: params.id,
         playerId: homePlayer?.id,
       });
-    socket.emit("myDM", {
-      id: homePlayer?.id,
-      gamesession_id: params.id,
-    });
+
+      socket.emit("myDM", {
+        id: homePlayer?.id,
+        gamesession_id: params.id,
+      });
+    }
+
     localStorage.setItem("currentGameSession", JSON.stringify(params.id));
-  }, [
-    homePlayer?.id,
-    guessPlayer,
-    params,
-    homePlayer,
-    gameUrl,
-    setCurrentGame,
-    router,
-  ]);
+  }, [homePlayer?.id, params, homePlayer, router]);
 
   socket.on("round", (data) => {
     if (data) {
@@ -110,50 +108,18 @@ export default function Page() {
             "guess_player",
             JSON.stringify(data.guessPlayer)
           );
-        } else if (data.role === "guess_player") {
+          setRole("home_player");
+          localStorage.setItem("status", "home_player");
+        } else {
           localStorage.setItem("home_player", JSON.stringify(data.guessPlayer));
           localStorage.setItem("guess_player", JSON.stringify(data.homePlayer));
+          setRole("guess_player");
+          localStorage.setItem("status", "guess_player");
         }
       }
     }
   });
-  console.log(role);
-  socket.on(
-    "notify",
-    (data: {
-      guessPlayer: any;
-      homePlayer: { id: string | undefined };
-      role: SetStateAction<string>;
-    }) => {
-      if (data) {
-        console.log("notify: ", data);
-        if (data.guessPlayer) {
-          console.log("guess player connected: ", data);
-          if (data.homePlayer.id === homePlayer.id) {
-            console.log("i am the home player");
-            localStorage.setItem(
-              "guess_player",
-              JSON.stringify(data.guessPlayer)
-            );
-            setRole(data.role);
-            localStorage.setItem("status", role);
-          } else if (data.role === "guess_player") {
-            localStorage.setItem(
-              "home_player",
-              JSON.stringify(data.guessPlayer)
-            );
-            localStorage.setItem(
-              "guess_player",
-              JSON.stringify(data.homePlayer)
-            );
-            setRole(data.role);
-            localStorage.setItem("status", data.role);
-          }
-        }
-      }
-    }
-  );
-
+  // console.log(role);
   const handleGenerate = () => {
     const data = {
       home_player_id: homePlayer.id,
@@ -173,11 +139,15 @@ export default function Page() {
     if (data) {
       console.log("receive_guess: ", data);
       if (data.role === "home_player") {
+        console.log("home_player guess", data.guess);
         setHomeGuess(data.guess);
       } else if (data.role === "guess_player") {
+        console.log("guess_player guess", data.guess);
+
         setGuessGuess(data.guess);
       }
       setScore(data.score);
+      setCategory(data.category);
       console.log("check game state", data?.gameState);
     }
   });
@@ -192,8 +162,9 @@ export default function Page() {
         setHomePlayerHint(data.message);
       }
       setChoiceMadeId(data.choice);
+      setCategory(data.category);
+      setChoiceReceived(true);
     }
-    setChoiceReceived(true);
   });
   const sendChoiceOrGuess = () => {
     const choiceData = {
@@ -202,12 +173,13 @@ export default function Page() {
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
-      role: localStorage.getItem("status") || "",
+      role: "guess_player",
       player_id: guessPlayer
         ? guessPlayer.id
         : homePlayer
         ? homePlayer.id
         : undefined,
+      category,
     };
 
     const guessData = {
@@ -219,8 +191,9 @@ export default function Page() {
         : homePlayer
         ? homePlayer.id
         : undefined,
-      role: localStorage.getItem("status") || "",
+      role: "guess_player",
       gamesession_id: params.id,
+      category,
     };
 
     if (!choiceReceived) {
@@ -257,10 +230,13 @@ export default function Page() {
     }
   });
 
-  // console.log("guessPlayer", guessPlayer);
-  // console.log("homePlayer", homePlayer);
+  const result = (str1: string, str2: string) => {
+    if (selectedCard !== "?" && guessGuess !== "?")
+      return selectedCard === guessGuess;
+  };
+
   return (
-    <main className="flex mobile:max-sm:flex-col-reverse  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
+    <main className="flex mobile:max-sm:flex-col-reverse justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
       {/* ############ GAME AREA ########### */}
       <div className="py-4 px-8 w-full mobile:max-sm:px-2 mobile:max-sm:h-[calc(100vh-180px)] flex flex-col gap-5">
         <div className=" flex justify-between w-full">
@@ -269,7 +245,7 @@ export default function Page() {
               name="Type"
               defaultValue="Words"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
+              className="border-themecolor rounded px-2 cursor-pointer outline-none text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0 w-[7rem] duration-300"
               // value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -283,24 +259,24 @@ export default function Page() {
             </select>
 
             {/* <select
-              name="Type"
-              defaultValue="cards"
-              id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
-            >
-              <option value="cards">cards</option>
-              <option value="animals">animals</option>
-              <option value="food">food</option>
-              <option value="cars">cars</option>
-              <option value="people">people</option>
-              <option value="birds">birds</option>
-            </select> */}
+ name="Type"
+ defaultValue="cards"
+ id=""
+ className="border-themecolor rounded px-2 cursor-pointer outline-none text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0 w-[7rem] duration-300"
+ >
+ <option value="cards">cards</option>
+ <option value="animals">animals</option>
+ <option value="food">food</option>
+ <option value="cars">cars</option>
+ <option value="people">people</option>
+ <option value="birds">birds</option>
+ </select> */}
 
             <select
               name="Number"
               defaultValue="5"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border  w-[4rem] duration-300"
+              className="border-themecolor rounded px-2 cursor-pointer outline-none text-themecolor border w-[4rem] duration-300"
               // value={numberOfOptions}
               onChange={(e) => setNumberOfOptions(+e.target.value)}
             >
@@ -334,17 +310,22 @@ export default function Page() {
           </div>
 
           <div className="flex gap-3 items-center justify-center">
-            <CopyToClipboard text={gameUrl} onCopy={handleCopy}>
-              <button
-                // onClick={handleCopy}
-                className="flex gap-1  items-center p-2  text-green-600"
-              >
-                <span className="text-green-600">
-                  {gameUrl ? gameUrl : "link to share"}
-                </span>
-                <PiCopySimpleLight size={20} />
-              </button>
-            </CopyToClipboard>
+            <Copy
+              gameUrl={gameUrl}
+              handleCopy={handleCopy}
+              image={selectedCard}
+            />
+            {result(selectedCard, guessGuess) ? (
+              <span>
+                {/* <FaCheck size={50} className="text-green-800 w-full mx-auto" /> */}
+                <FcCloseUpMode
+                  size={50}
+                  className="text-green-800 w-full mx-auto"
+                />{" "}
+              </span>
+            ) : (
+              <GrClose size={50} className="text-red-800 w-full mx-auto" />
+            )}
           </div>
 
           <div className="flex flex-col justify-center items-center">
@@ -390,7 +371,7 @@ export default function Page() {
 
       {/* ############ GAME AREA ########### */}
 
-      <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md  h-full px-2 py-4 gap-5">
+      <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md h-full px-2 py-4 gap-5">
         <Scores
           homePlayer={homePlayer}
           guessPlayer={guessPlayer}
