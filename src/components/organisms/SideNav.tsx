@@ -8,6 +8,9 @@ import CreateGame from "./CreateGame";
 import { toast } from "react-toastify";
 import { socket } from "@/utils/service/constant";
 import { string } from "prop-types";
+import Image from "next/image";
+// import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 export default function SideNav() {
   if(typeof localStorage === "undefined") return;
@@ -15,17 +18,24 @@ export default function SideNav() {
   const [startNewGame, setStartNewGame] = useState(false);
   const myDms = JSON.parse(localStorage.getItem("myDM")!)  || []; 
 
+  const router = useRouter();
+
   return (
     <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2">
       <div className="flex flex-col w-full gap-30">
-        <div className="text-white font-bold mb-[40px]">
+        <div className="text-white flex justify-center items-center font-bold mb-[40px]">
           <Link href={"/"}>
-            <h3 className=" text-center">PockerPlay</h3>
+            <Image
+              src={"/POCKERPLAY-LOGO-white.png"}
+              alt=""
+              width={200}
+              height={100}
+            />
           </Link>
         </div>
         <div>
           <div>
-            <button className="hover:bg-white duration-300 text-white w-full p-2  hover:text-themecolor">
+            <button className="hover:bg-white border-b border-b-1 border-b-slate-400 duration-300 text-white w-full p-2  hover:text-themecolor">
               New Game
             </button>
           </div>
@@ -64,12 +74,14 @@ export default function SideNav() {
               if(me){
                 socket.emit('logout', {player_id: me?.id});
               }
+              localStorage.clear();
+              router.replace("/");
               setOpenLogout((prev) => !prev);
             }}
             styles={"bg-themecolor text-white rounded"}
             actionBTNStyle={"border border-red-600 text-red-600"}
           />
-          <Overlay onClick={() => setOpenLogout((prev) => !prev)} transparent />
+          <Overlay onClick={() => setOpenLogout((prev) => !prev)} />
         </>
       )}
 

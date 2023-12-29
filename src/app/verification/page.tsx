@@ -29,8 +29,12 @@ export default function Verification() {
     } else return null;
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading((prev) => !prev);
+
     if (name) {
       const data = { username: name };
       console.log("data", data);
@@ -38,10 +42,12 @@ export default function Verification() {
       if (user) {
         console.log(user);
         setUserData(user);
+
         localStorage.setItem("home_player", JSON.stringify(user));
         if (currentGame) {
           router.push(`/dashboard/${currentGame}`);
         }
+        router.push("/dashboard");
       }
     }
   };
@@ -53,7 +59,7 @@ export default function Verification() {
   };
 
   return (
-    <main className="flex min-h-screen ">
+    <main className="flex min-h-screen relative">
       <HomeNav hidden={false} />
 
       <div className="flex items-center mobile:max-sm:flex-col mobile:max-sm:justify-center mobile:max-sm:text-center mobile:max-sm:w-[95vw] px-24  w-full h-[80vh] justify-between mobile:max-sm:mt-10  mt-[10vh] m-auto">
@@ -73,11 +79,13 @@ export default function Verification() {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+
             <button
               className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
-              onClick={() => {
-                if (userData) router.push("/dashboard");
-              }}
+              // onClick={() => {
+              //   setIsLoading((prev) => !prev);
+              //   if (userData) router.push("/dashboard");
+              // }}
               onKeyDown={handleKeyDown}
             >
               Continue
@@ -102,6 +110,11 @@ export default function Verification() {
           />
         </div>
       </div>
+      {isLoading && (
+        <div className="w-full h-full absolute flex items-center justify-center">
+          <RoundLoader />
+        </div>
+      )}
     </main>
   );
 }
