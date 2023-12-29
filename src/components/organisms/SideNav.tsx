@@ -7,12 +7,16 @@ import Link from "next/link";
 import CreateGame from "./CreateGame";
 import { toast } from "react-toastify";
 import Image from "next/image";
+// import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 export default function SideNav() {
   const [openLogout, setOpenLogout] = useState(false);
   const [startNewGame, setStartNewGame] = useState(false);
   if (typeof localStorage === "undefined") return;
   const myDms = JSON.parse(localStorage.getItem("myDM")!) || [];
+
+  const router = useRouter();
 
   return (
     <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2">
@@ -64,11 +68,14 @@ export default function SideNav() {
             content={"Are you sure you want to leave the Game?"}
             actionText={"Logout"}
             onCancel={() => setOpenLogout((prev) => !prev)}
-            onAction={() => setOpenLogout((prev) => !prev)}
+            onAction={() => {
+              localStorage.clear();
+              router.replace("/");
+            }}
             styles={"bg-themecolor text-white rounded"}
             actionBTNStyle={"border border-red-600 text-red-600"}
           />
-          <Overlay onClick={() => setOpenLogout((prev) => !prev)} transparent />
+          <Overlay onClick={() => setOpenLogout((prev) => !prev)} />
         </>
       )}
 
