@@ -9,9 +9,8 @@ import { signupFn } from "@/utils/service/api-call";
 import RoundLoader from "@/components/atoms/RoundLoader";
 import { useRouter } from "next/navigation";
 
-import { useAppContext } from "../Context/AppContext";
-
 import HomeNav from "@/components/organisms/HomeNav";
+import { useAppContext } from "../Context/AppContext";
 
 export default function Verification() {
   const router = useRouter();
@@ -38,9 +37,7 @@ export default function Verification() {
 
         localStorage.setItem("home_player", JSON.stringify(user));
         if (currentGame) {
-          console.log("current game", currentGame);
           setIsGuess(false);
-
           return router.push(`/dashboard/${currentGame}`);
         }
         console.log("not current game");

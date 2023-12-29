@@ -16,8 +16,6 @@ interface DataType {
   setCurrentGame: Dispatch<SetStateAction<string>>;
   isguess: boolean;
   setIsGuess: Dispatch<SetStateAction<boolean>>;
-  // socket: any;
-  // setSocket: Dispatch<SetStateAction<any>>;
 }
 
 const initialState: DataType = {
@@ -25,8 +23,6 @@ const initialState: DataType = {
   setCurrentGame: () => "",
   isguess: false,
   setIsGuess: () => null,
-  // socket: null,
-  // setSocket: () => null
 };
 
 const AppContext = createContext<DataType>(initialState);
@@ -35,16 +31,12 @@ export const AppContextProvider = ({ children }: any) => {
  
   const [currentGame, setCurrentGame] = useState<string>("");
   const [isguess, setIsGuess] = useState<boolean>(false);
-  // const [socket, setSocket] = useState<typeof io>();
   const values = {
     currentGame,
     setCurrentGame,
-    isguess, setIsGuess,
-    // socket, setSocket
+    isguess,
+    setIsGuess,
   };
-
-
-
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;
 };

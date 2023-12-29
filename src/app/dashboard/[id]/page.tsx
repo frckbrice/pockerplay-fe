@@ -21,6 +21,7 @@ import Copy from "@/components/Copy";
 
 import Popups from "@/components/atoms/Popups";
 import Overlay from "@/components/atoms/Overlay";
+import { Socket } from "socket.io-client";
 
 export default function Page() {
   const router = useRouter();
@@ -29,8 +30,6 @@ export default function Page() {
   const [score, setScore] = useState<Score>();
   const [homePlayer, setHomePlayer] = useState<User>(() => {
     if (typeof localStorage !== "undefined") {
-      // console.log("checking made in the entering homplayer");
-
       return (
         JSON.parse(localStorage.getItem("home_player")!) || {
           name: "",
@@ -63,7 +62,11 @@ export default function Page() {
   const [choiceReceived, setChoiceReceived] = useState<boolean>(false);
   const [guessReceived, setGuessReceived] = useState<string>("");
   const [game, setGame] = useState<GameSession>();
-  const [role, setRole] = useState<string>("");
+  const [role, setRole] = useState<string>(() => {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("status")) {
+      return JSON.parse(localStorage.getItem("status")! || "");
+    } else return "";
+  });
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
   const { setCurrentGame, isguess, setIsGuess } = useAppContext();
   const params = useParams();
@@ -97,7 +100,19 @@ export default function Page() {
         gamesession_id: params.id,
       });
     }
-  }, [homePlayer?.id, params, homePlayer, setCurrentGame, router]);
+    socket.on("connection", (socket) => {
+      localStorage.setItem("websocket", JSON.stringify(socket));
+    });
+
+    socket.on("error", (err: Error) => {
+      console.log("error", err);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("close");
+      socket.connect();
+    });
+  }, [homePlayer?.id, setCurrentGame, setIsGuess, params, homePlayer, router]);
 
   socket.on("round", (data) => {
     if (data) {
@@ -107,6 +122,8 @@ export default function Page() {
       alert("only 5 round per game session allowed ");
     }
   });
+
+  console.log("role", role);
 
   socket.on("notify", (data) => {
     if (data) {
@@ -192,7 +209,7 @@ export default function Page() {
       player_choice: selectedCard,
       proposals: generatedData,
       role: role,
-      player_id: role === "home_player" ? homePlayer.id : guessPlayer.id,
+      player_id: role === "home_player" ? homePlayer?.id : guessPlayer?.id,
       category,
     };
 
@@ -200,7 +217,7 @@ export default function Page() {
       round_id: round?.id,
       choice_id: choiceMadeId ? choiceMadeId : "",
       player_guess: selectedCard,
-      player_id: role === "home_player" ? homePlayer.id : guessPlayer.id,
+      player_id: role === "home_player" ? homePlayer?.id : guessPlayer?.id,
       role: role,
       gamesession_id: params.id,
       category,
@@ -216,8 +233,8 @@ export default function Page() {
       setGenerataedData([]);
     }
   };
-  socket.on("myDM", (data: string | any[]) => {
-    if (data.length) {
+  socket.on("myDM", (data) => {
+    if (data?.length) {
       console.log("my dm ", data);
       localStorage.setItem("myDM", JSON.stringify(data));
     }
@@ -257,7 +274,7 @@ export default function Page() {
               name="Type"
               defaultValue="Words"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
+              className="border-themecolor rounded px-2 cursor-pointer outline-none text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0 w-[7rem] duration-300"
               // value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -270,25 +287,11 @@ export default function Page() {
               <option value="Images">Images</option>
             </select>
 
-            {/* <select
-              name="Type"
-              defaultValue="cards"
-              id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0   w-[7rem] duration-300"
-            >
-              <option value="cards">cards</option>
-              <option value="animals">animals</option>
-              <option value="food">food</option>
-              <option value="cars">cars</option>
-              <option value="people">people</option>
-              <option value="birds">birds</option>
-            </select> */}
-
             <select
               name="Number"
               defaultValue="5"
               id=""
-              className="border-themecolor  rounded px-2 cursor-pointer outline-none   text-themecolor border  w-[4rem] duration-300"
+              className="border-themecolor rounded px-2 cursor-pointer outline-none text-themecolor border w-[4rem] duration-300"
               // value={numberOfOptions}
               onChange={(e) => setNumberOfOptions(+e.target.value)}
             >
@@ -392,7 +395,7 @@ export default function Page() {
 
       {/* ############ GAME AREA ########### */}
 
-      <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md  h-full px-2 py-4 gap-5">
+      <div className="bg-white flex flex-col w-[240px] mobile:max-sm:w-full shadow-md h-full px-2 py-4 gap-5">
         <Scores
           homePlayer={homePlayer}
           guessPlayer={guessPlayer}
