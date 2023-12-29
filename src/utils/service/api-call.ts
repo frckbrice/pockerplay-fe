@@ -16,5 +16,3 @@ export const signupFn = async (user: {
   if (apiUser.ok) return apiUser.json() as Promise<User | null>;
   return null;
 };
-
-console.log(api_call);

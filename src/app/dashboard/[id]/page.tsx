@@ -42,8 +42,10 @@ export default function Page() {
   });
   const [guessPlayer, setGuessPlayer] = useState<User>(() => {
     if (typeof localStorage !== "undefined") {
-      // console.log("checking made in the entering guessplayer");
-      if (localStorage.getItem("guess_player") !== "undefined")
+      if (
+        localStorage.getItem("guess_player") !== "undefined" &&
+        localStorage.getItem("guess_player")
+      )
         return JSON.parse(localStorage.getItem("guess_player") || "{}");
     } else return null;
   });
@@ -63,48 +65,39 @@ export default function Page() {
   const [game, setGame] = useState<GameSession>();
   const [role, setRole] = useState<string>("");
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
-  const { setCurrentGame } = useAppContext();
+  const { setCurrentGame, isguess, setIsGuess } = useAppContext();
   const params = useParams();
   const [IsWinner, setwinner] = useState(false);
   const [isLooser, setIsLooser] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [EndOfRound, setEndOfRound] = useState(false);
 
-  let i: number = 1;
   useEffect(() => {
     if (
       !homePlayer?.id ||
       homePlayer === undefined ||
       !Object?.keys(homePlayer).length
     ) {
-      console.log("no home player");
+      //   console.log("no home player");
+      //   localStorage.setItem("currentGameSession", JSON.stringify(params.id));
+      setCurrentGame(params.id as string);
+      setIsGuess(true);
       return router.push("/verification");
     }
 
-   console.log(guessGuess)
-    setGameUrl(`"${public_call}/dashboard/${params.id}"`);
- 
-    if (homePlayer)
+    if (!isguess) setGameUrl(`"${public_call}/dashboard/${params.id}"`);
+
+    if (homePlayer) {
       socket.emit("joingame", {
         gamesession_id: params.id,
         playerId: homePlayer?.id,
       });
-    socket.emit("myDM", {
-      id: homePlayer?.id,
-      gamesession_id: params.id,
-    });
-
-    localStorage.setItem("currentGameSession", JSON.stringify(params.id));
-
-  }, [
-    homePlayer?.id,
-    guessPlayer,
-    params,
-    homePlayer,
-    gameUrl,
-    setCurrentGame,
-    router,
-  ]);
+      socket.emit("myDM", {
+        id: homePlayer?.id,
+        gamesession_id: params.id,
+      });
+    }
+  }, [homePlayer?.id, params, homePlayer, setCurrentGame, router]);
 
   socket.on("round", (data) => {
     if (data) {
@@ -126,18 +119,21 @@ export default function Page() {
             "guess_player",
             JSON.stringify(data.guessPlayer)
           );
+          setGuessPlayer(data.guessPlayer);
           setRole("home_player");
           localStorage.setItem("status", "home_player");
         } else {
           localStorage.setItem("home_player", JSON.stringify(data.guessPlayer));
+          setHomePlayer(data.guessPlayer);
           localStorage.setItem("guess_player", JSON.stringify(data.homePlayer));
+          setGuessPlayer(data.homePlayer);
           setRole("guess_player");
           localStorage.setItem("status", "guess_player");
         }
       }
     }
   });
-//  console.log(role);
+  //  console.log(role);
   const handleGenerate = () => {
     const data = {
       home_player_id: homePlayer.id,
@@ -161,7 +157,7 @@ export default function Page() {
         setHomeGuess(data.guess);
       } else if (data.role === "guess_player") {
         console.log("guess_player guess", data.guess);
-       
+
         setGuessGuess(data.guess);
       }
       setScore(data.score);
@@ -183,8 +179,11 @@ export default function Page() {
       setCategory(data.category);
       setChoiceReceived(true);
     }
-   
   });
+
+
+  console.log(guessGuess)
+
   const sendChoiceOrGuess = () => {
     const choiceData = {
       gamesession_id: params.id,
@@ -192,12 +191,8 @@ export default function Page() {
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
-      role: "home_player",
-      player_id: guessPlayer
-        ? guessPlayer.id
-        : homePlayer
-        ? homePlayer.id
-        : undefined,
+      role: role,
+      player_id: role === "home_player" ? homePlayer.id : guessPlayer.id,
       category,
     };
 
@@ -205,12 +200,8 @@ export default function Page() {
       round_id: round?.id,
       choice_id: choiceMadeId ? choiceMadeId : "",
       player_guess: selectedCard,
-      player_id: guessPlayer
-        ? guessPlayer.id
-        : homePlayer
-        ? homePlayer.id
-        : undefined,
-      role: "home_player",
+      player_id: role === "home_player" ? homePlayer.id : guessPlayer.id,
+      role: role,
       gamesession_id: params.id,
       category,
     };
@@ -218,9 +209,11 @@ export default function Page() {
     if (!choiceReceived) {
       console.log(choiceData);
       socket.emit("send_choice", choiceData);
+      setGenerataedData([]);
     } else {
       console.log(guessData);
       socket.emit("send_guess", guessData);
+      setGenerataedData([]);
     }
   };
   socket.on("myDM", (data: string | any[]) => {
@@ -254,7 +247,6 @@ export default function Page() {
       return selectedCard === guessGuess;
   };
 
-  
   return (
     <main className="flex mobile:max-sm:flex-col-reverse relative  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
       {/* ############ GAME AREA ########### */}
@@ -339,8 +331,12 @@ export default function Page() {
           </div>
 
           <div className="flex gap-3 items-center justify-center">
-         <Copy gameUrl={gameUrl} handleCopy={handleCopy} image={selectedCard} />
-         {result(selectedCard, guessGuess) ? (
+            <Copy
+              gameUrl={gameUrl}
+              handleCopy={handleCopy}
+              image={selectedCard}
+            />
+            {result(selectedCard, guessGuess) ? (
               <span>
                 {/* <FaCheck size={50} className="text-green-800 w-full mx-auto" /> */}
                 <FcCloseUpMode
