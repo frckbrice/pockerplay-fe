@@ -14,7 +14,7 @@ interface DataType {
 
 const initialState: DataType = {
   currentGame: "",
-  setCurrentGame: () => null,
+  setCurrentGame: () => "",
 };
 
 const AppContext = createContext<DataType>(initialState);
