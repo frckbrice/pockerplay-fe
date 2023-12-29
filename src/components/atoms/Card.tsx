@@ -13,6 +13,7 @@ export default function Card({
   className,
   category,
 }: CardProps) {
+
   return (
     <button
       onClick={onClick}

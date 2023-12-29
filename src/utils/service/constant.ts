@@ -13,4 +13,3 @@ export const socket = io(api_call || "", {
   upgrade: false,
   rejectUnauthorized: false,
 });
-// http://localhost:3000/dashboard/a60d4c60-3438-497c-8913-3fdca3f933dc

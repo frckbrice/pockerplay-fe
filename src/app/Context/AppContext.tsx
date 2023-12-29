@@ -26,7 +26,7 @@ export const AppContextProvider = ({ children }: any) => {
     currentGame,
     setCurrentGame,
   };
-  console.log(values);
+
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;
 };
 
