@@ -6,6 +6,7 @@ import Popups from "../atoms/Popups";
 import Link from "next/link";
 import CreateGame from "./CreateGame";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 export default function SideNav() {
   const [openLogout, setOpenLogout] = useState(false);
@@ -16,14 +17,19 @@ export default function SideNav() {
   return (
     <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2">
       <div className="flex flex-col w-full gap-30">
-        <div className="text-white font-bold mb-[40px]">
+        <div className="text-white flex justify-center items-center font-bold mb-[40px]">
           <Link href={"/"}>
-            <h3 className=" text-center">PockerPlay</h3>
+            <Image
+              src={"/POCKERPLAY-LOGO-white.png"}
+              alt=""
+              width={200}
+              height={100}
+            />
           </Link>
         </div>
         <div>
           <div>
-            <button className="hover:bg-white duration-300 text-white w-full p-2  hover:text-themecolor">
+            <button className="hover:bg-white border-b border-b-1 border-b-slate-400 duration-300 text-white w-full p-2  hover:text-themecolor">
               New Game
             </button>
           </div>

@@ -1,5 +1,7 @@
 "use client";
+import Footer from "@/components/organisms/Footer";
 import HomeNav from "@/components/organisms/HomeNav";
+import LogoGrid from "@/components/organisms/LogoGrid";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -90,6 +92,8 @@ export default function Home() {
           </p>
         </div>
       </div>
+      <LogoGrid />
+      <Footer />
     </main>
   );
 }

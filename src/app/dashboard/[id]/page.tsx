@@ -18,6 +18,9 @@ import { useParams, useRouter } from "next/navigation";
 import { public_call } from "@/utils/service/constant";
 import { useAppContext } from "@/app/Context/AppContext";
 import Copy from "@/components/organisms/Copy";
+import { Navigate, useNavigate } from "react-router-dom";
+import Popups from "@/components/atoms/Popups";
+import Overlay from "@/components/atoms/Overlay";
 
 export default function Page() {
   const router = useRouter();
@@ -59,6 +62,11 @@ export default function Page() {
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
   const { setCurrentGame } = useAppContext();
   const params = useParams();
+  const [IsWinner, setwinner] = useState(false);
+  const [isLooser, setIsLooser] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [EndOfRound, setEndOfRound] = useState(false);
+
   let i: number = 1;
   useEffect(() => {
     if (
@@ -236,7 +244,7 @@ export default function Page() {
   };
 
   return (
-    <main className="flex mobile:max-sm:flex-col-reverse justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
+    <main className="flex mobile:max-sm:flex-col-reverse relative  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
       {/* ############ GAME AREA ########### */}
       <div className="py-4 px-8 w-full mobile:max-sm:px-2 mobile:max-sm:h-[calc(100vh-180px)] flex flex-col gap-5">
         <div className=" flex justify-between w-full">
@@ -288,12 +296,21 @@ export default function Page() {
               <option value="10">10</option>
             </select>
           </div>
-          <button
-            onClick={handleGenerate}
-            className=" border rounded-md mobile:max-sm:h-[4rem] border-themecolor hover:bg-themecolor hover:text-white transition-all duration-300 text-themecolor p-2"
-          >
-            🃏 Generate
-          </button>
+
+          <div>
+            <button
+              // onClick={handleGenerate}
+              className=" border rounded-md mobile:max-sm:h-[4rem] border-themecolor hover:bg-themecolor hover:text-white transition-all duration-300 text-themecolor p-2"
+            >
+              Clear
+            </button>{" "}
+            <button
+              onClick={handleGenerate}
+              className=" border rounded-md mobile:max-sm:h-[4rem] border-themecolor hover:bg-themecolor hover:text-white transition-all duration-300 text-themecolor p-2"
+            >
+              🃏 Generate
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-between items-center w-full">
@@ -391,6 +408,59 @@ export default function Page() {
           insights
         </button>
       </div>
+      {isGameOver && (
+        <div
+          style={{
+            backgroundImage:
+              "url(https://png2.cleanpng.com/sh/932b0a95c4c25dc288841e425028b56e/L0KzQYm3U8AzN5p6iZH0aYP2gLBuTgJmbF5qhuhubHBzdX7qjPlxNZJ3jJ9CaX7xebBuTgJmbF53edt3LUXkSYrtVsdmOWM4T9UDLka0SIa5UcQ0OWY3SKI8OUW4QIGAVMYveJ9s/kisspng-red-envelope-clip-art-winning-red-rain-5a99f67e1237c8.6185214315200395500746.png)",
+          }}
+          className="absolute z-40 h-full w-full mobile:max-sm:w-[80vw] bg-white "
+        >
+          <div className="flex flex flex-col justify-center items-center w-full h-full">
+            {IsWinner && (
+              <Popups
+                title={"CONGRATULATIONS"}
+                content={"you won 🌞👏👏👏"}
+                actionText={"NEW GAME"}
+                onCancel={() => setIsGameOver((prev) => !prev)}
+                onAction={function (): void {
+                  throw new Error("Function not implemented.");
+                }}
+                styles={"border rounded"}
+                actionBTNStyle={"border text-themecolor"}
+              />
+            )}
+
+            {!isLooser && (
+              <Popups
+                title={"GAME OVER"}
+                content={"you loose "}
+                actionText={"NEW GAME"}
+                onCancel={() => setIsGameOver((prev) => !prev)}
+                onAction={function (): void {
+                  throw new Error("Function not implemented.");
+                }}
+                styles={"border rounded"}
+                actionBTNStyle={"border text-themecolor"}
+              />
+            )}
+          </div>
+        </div>
+      )}
+      {!EndOfRound && (
+        <>
+          <Overlay onClick={() => setEndOfRound((prev) => !prev)} transparent />
+          <Popups
+            title={"Round end"}
+            content={"you won"}
+            actionText={"NEXT ROUND"}
+            onCancel={() => setEndOfRound((prev) => !prev)}
+            onAction={() => setEndOfRound((prev) => !prev)}
+            styles={"bg-themecolor text-white"}
+            actionBTNStyle={""}
+          />
+        </>
+      )}
     </main>
   );
 }
