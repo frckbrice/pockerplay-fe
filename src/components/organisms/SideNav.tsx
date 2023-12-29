@@ -11,12 +11,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function SideNav() {
+  const router = useRouter();
   const [openLogout, setOpenLogout] = useState(false);
   const [startNewGame, setStartNewGame] = useState(false);
   if (typeof localStorage === "undefined") return;
   const myDms = JSON.parse(localStorage.getItem("myDM")!) || [];
-
-  const router = useRouter();
 
   return (
     <div className="flex flex-col justify-between bg-themecolor w-[240px] h-[100vh] items-center py-2">
@@ -46,7 +45,7 @@ export default function SideNav() {
                     key={i}
                     className=" text-center text-[#f5f6f8] text-[11px]"
                   >
-                    {user.username}{" "}
+                    {user?.username}
                   </span>
                 ))
               : null}

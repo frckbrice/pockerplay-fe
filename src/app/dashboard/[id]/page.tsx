@@ -21,6 +21,7 @@ import Copy from "@/components/organisms/Copy";
 
 import Popups from "@/components/atoms/Popups";
 import Overlay from "@/components/atoms/Overlay";
+import { Socket } from "socket.io-client";
 
 export default function Page() {
   const router = useRouter();
@@ -58,9 +59,13 @@ export default function Page() {
   const [choiceReceived, setChoiceReceived] = useState<boolean>(false);
   const [guessReceived, setGuessReceived] = useState<string>("");
   const [game, setGame] = useState<GameSession>();
-  const [role, setRole] = useState<string>("");
+  const [role, setRole] = useState<string>(() => {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("status")) {
+      return JSON.parse(localStorage.getItem("status")! || "");
+    } else return "";
+  });
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
-  const { setCurrentGame } = useAppContext();
+  const { setCurrentGame, setIsGuess } = useAppContext();
   const params = useParams();
   const [IsWinner, setwinner] = useState(false);
   const [isLooser, setIsLooser] = useState(false);
@@ -75,6 +80,8 @@ export default function Page() {
       !Object?.keys(homePlayer).length
     ) {
       console.log("no home player");
+      setCurrentGame(params.id as string);
+      setIsGuess(true);
       return router.push("/verification");
     }
 
@@ -92,9 +99,19 @@ export default function Page() {
         gamesession_id: params.id,
       });
     }
+    socket.on("connection", (socket) => {
+      localStorage.setItem("websocket", JSON.stringify(socket));
+    });
 
-    localStorage.setItem("currentGameSession", JSON.stringify(params.id));
-  }, [homePlayer?.id, params, homePlayer, router]);
+    socket.on("error", (err: Error) => {
+      console.log("error", err);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("close");
+      socket.connect();
+    });
+  }, [homePlayer?.id, setCurrentGame, setIsGuess, params, homePlayer, router]);
 
   socket.on("round", (data) => {
     if (data) {
@@ -104,6 +121,8 @@ export default function Page() {
       alert("only 5 round per game session allowed ");
     }
   });
+
+  console.log("role", role);
 
   socket.on("notify", (data) => {
     if (data) {
@@ -116,11 +135,14 @@ export default function Page() {
             "guess_player",
             JSON.stringify(data.guessPlayer)
           );
+          setGuessPlayer(data.guessPlayer);
           setRole("home_player");
           localStorage.setItem("status", "home_player");
         } else {
           localStorage.setItem("home_player", JSON.stringify(data.guessPlayer));
+          setHomePlayer(data.guessPlayer);
           localStorage.setItem("guess_player", JSON.stringify(data.homePlayer));
+          setGuessPlayer(data.homePlayer);
           setRole("guess_player");
           localStorage.setItem("status", "guess_player");
         }
@@ -181,12 +203,8 @@ export default function Page() {
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
-      role: "guess_player",
-      player_id: guessPlayer
-        ? guessPlayer.id
-        : homePlayer
-        ? homePlayer.id
-        : undefined,
+      role: role,
+      player_id: role === "guess_player" ? guessPlayer.id : homePlayer.id,
       category,
     };
 
@@ -194,12 +212,8 @@ export default function Page() {
       round_id: round?.id,
       choice_id: choiceMadeId ? choiceMadeId : "",
       player_guess: selectedCard,
-      player_id: guessPlayer
-        ? guessPlayer.id
-        : homePlayer
-        ? homePlayer.id
-        : undefined,
-      role: "guess_player",
+      player_id: role === "guess_player" ? guessPlayer.id : homePlayer.id,
+      role: role,
       gamesession_id: params.id,
       category,
     };
@@ -207,13 +221,15 @@ export default function Page() {
     if (!choiceReceived) {
       console.log(choiceData);
       socket.emit("send_choice", choiceData);
+      setGenerataedData([]);
     } else {
       console.log(guessData);
       socket.emit("send_guess", guessData);
+      setGenerataedData([]);
     }
   };
-  socket.on("myDM", (data: string | any[]) => {
-    if (data.length) {
+  socket.on("myDM", (data) => {
+    if (data?.length) {
       console.log("my dm ", data);
       localStorage.setItem("myDM", JSON.stringify(data));
     }
@@ -265,20 +281,6 @@ export default function Page() {
               </option>
               <option value="Images">Images</option>
             </select>
-
-            {/* <select
- name="Type"
- defaultValue="cards"
- id=""
- className="border-themecolor rounded px-2 cursor-pointer outline-none text-themecolor border mobile:max-sm:w-[5rem] mobile:max-sm:px-0 w-[7rem] duration-300"
- >
- <option value="cards">cards</option>
- <option value="animals">animals</option>
- <option value="food">food</option>
- <option value="cars">cars</option>
- <option value="people">people</option>
- <option value="birds">birds</option>
- </select> */}
 
             <select
               name="Number"
@@ -416,7 +418,7 @@ export default function Page() {
           }}
           className="absolute z-40 h-full w-full mobile:max-sm:w-[80vw] bg-white "
         >
-          <div className="flex flex flex-col justify-center items-center w-full h-full">
+          <div className="flex flex-col justify-center items-center w-full h-full">
             {IsWinner && (
               <Popups
                 title={"CONGRATULATIONS"}
