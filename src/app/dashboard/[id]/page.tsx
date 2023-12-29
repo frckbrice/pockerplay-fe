@@ -85,7 +85,6 @@ export default function Page() {
       return router.push("/verification");
     }
 
-    // console.log(guessGuess);
     setGameUrl(`"${public_call}/dashboard/${params.id}"`);
 
     if (homePlayer) {
