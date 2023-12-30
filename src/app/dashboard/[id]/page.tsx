@@ -22,6 +22,7 @@ import Copy from "@/components/Copy";
 import Popups from "@/components/atoms/Popups";
 import Overlay from "@/components/atoms/Overlay";
 import { Socket } from "socket.io-client";
+import CardGuess from "@/components/atoms/CardGuess";
 
 export default function Page() {
   const router = useRouter();
@@ -40,12 +41,12 @@ export default function Page() {
     } else return null;
   });
   const [guessPlayer, setGuessPlayer] = useState<User>(() => {
-    if (typeof localStorage !== "undefined") {
-      if (
-        localStorage.getItem("guess_player") !== "undefined" &&
-        localStorage.getItem("guess_player")
-      )
-        return JSON.parse(localStorage.getItem("guess_player") || "{}");
+    if (
+      typeof localStorage !== "undefined" &&
+      localStorage.getItem("guess_player") !== "undefined" &&
+      localStorage.getItem("guess_player")
+    ) {
+      return JSON.parse(localStorage.getItem("guess_player") || "{}");
     } else return null;
   });
   const [round, setRound] = useState<Round>();
@@ -60,12 +61,12 @@ export default function Page() {
   const [messagehint, setMessageHint] = useState<string>("");
   const [gameUrl, setGameUrl] = useState<string>("");
   const [choiceReceived, setChoiceReceived] = useState<boolean>(false);
-  const [guessReceived, setGuessReceived] = useState<string>("");
+  const [guessReceived, setGuessReceived] = useState<boolean>(false);
   const [game, setGame] = useState<GameSession>();
-  const [role, setRole] = useState<string>(() => {
+  const [role, setRole] = useState<string>((): any => {
     if (typeof localStorage !== "undefined" && localStorage.getItem("status")) {
-      return JSON.parse(localStorage.getItem("status")! || "");
-    } else return "";
+      return localStorage.getItem("status");
+    }
   });
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
   const { setCurrentGame, isguess, setIsGuess } = useAppContext();
@@ -101,7 +102,7 @@ export default function Page() {
       });
     }
     socket.on("connection", (socket) => {
-      localStorage.setItem("websocket", JSON.stringify(socket));
+      console.log("socket connected successfully");
     });
 
     socket.on("error", (err: Error) => {
@@ -160,7 +161,7 @@ export default function Page() {
       round_number: round?.round_number ? round?.round_number + 1 : 1,
     };
     if (data.round_number > 5) {
-      alert("this is the end of game.");
+      setwinner(true);
       data.round_number = 1;
       return;
     }
@@ -169,17 +170,10 @@ export default function Page() {
   socket.on("receive_guess", (data) => {
     if (data) {
       console.log("receive_guess: ", data);
-      if (data.role === "home_player") {
-        console.log("home_player guess", data.guess);
-        setHomeGuess(data.guess);
-      } else if (data.role === "guess_player") {
-        console.log("guess_player guess", data.guess);
-
-        setGuessGuess(data.guess);
-      }
+       setGuessGuess(data.guess);
       setScore(data.score);
       setCategory(data.category);
-      console.log("check game state", data?.gameState);
+      setGuessReceived(true);
     }
   });
   socket.on("receive_choice", (data) => {
@@ -195,16 +189,21 @@ export default function Page() {
       setChoiceMadeId(data.choice);
       setCategory(data.category);
       setChoiceReceived(true);
+      setRound(data.round);
     }
   });
 
-
-  console.log(guessGuess)
+  console.log(guessGuess);
 
   const sendChoiceOrGuess = () => {
+    if (!role || !round || !homePlayer || !guessPlayer) {
+      console.log(`" no round${round} id or no role${role} or no home player ${ homePlayer} or no guess_player ${guessPlayer}`);
+      return;
+    }
+
     const choiceData = {
       gamesession_id: params.id,
-      round_id: round?.id,
+      round: round,
       message_hint: messagehint,
       player_choice: selectedCard,
       proposals: generatedData,
@@ -222,15 +221,13 @@ export default function Page() {
       gamesession_id: params.id,
       category,
     };
-
-    if (!choiceReceived) {
-      console.log(choiceData);
-      socket.emit("send_choice", choiceData);
-      setGenerataedData([]);
-    } else {
-      console.log(guessData);
-      socket.emit("send_guess", guessData);
-      setGenerataedData([]);
+    if (choiceMadeId && choiceReceived) {
+        console.log(guessData);
+        socket.emit("send_guess", guessData);
+     
+    } else if(!choiceMadeId) {
+        console.log(choiceData);
+        socket.emit("send_choice", choiceData);
     }
   };
   socket.on("myDM", (data) => {
@@ -254,7 +251,9 @@ export default function Page() {
       } else if (data.role === "guess_player") {
         setGuessGuess(data.guess);
       }
-      if (data.gameState === "END") alert("the game is finish! retry...");
+      if (data.gameState === "END") {
+        setwinner(true);
+      }
       setGame(data.game);
     }
   });
@@ -263,6 +262,14 @@ export default function Page() {
     if (selectedCard !== "?" && guessGuess !== "?")
       return selectedCard === guessGuess;
   };
+
+  function endofRound() {
+    if (guessReceived && choiceReceived) {
+      setEndOfRound(true);
+    }
+  }
+
+  endofRound();
 
   return (
     <main className="flex mobile:max-sm:flex-col-reverse relative  justify-between bg-bgGray mobile:max-sm:h-auto bigScreen:h-[calc(100vh-50px)] h-[calc(100vh-49px)] ">
@@ -334,14 +341,16 @@ export default function Page() {
           </div>
 
           <div className="flex gap-3 items-center justify-center">
-            <Copy
-              gameUrl={gameUrl}
-              handleCopy={handleCopy}
-              image={selectedCard}
-            />
+            {!guessPlayer?.id && (
+              <Copy
+                gameUrl={gameUrl}
+                handleCopy={handleCopy}
+                image={selectedCard}
+              />
+            )}
+
             {result(selectedCard, guessGuess) ? (
               <span>
-                {/* <FaCheck size={50} className="text-green-800 w-full mx-auto" /> */}
                 <FcCloseUpMode
                   size={50}
                   className="text-green-800 w-full mx-auto"
@@ -353,7 +362,7 @@ export default function Page() {
           </div>
 
           <div className="flex flex-col justify-center items-center">
-            <Card
+            <CardGuess
               image={guessGuess}
               text={guessGuess}
               className={"w-[80px] h-[80px] "}
