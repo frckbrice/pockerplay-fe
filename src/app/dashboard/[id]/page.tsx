@@ -59,11 +59,7 @@ export default function Page() {
   const [choiceReceived, setChoiceReceived] = useState<boolean>(false);
   const [guessReceived, setGuessReceived] = useState<string>("");
   const [game, setGame] = useState<GameSession>();
-  const [role, setRole] = useState<string>(() => {
-    if (typeof localStorage !== "undefined" && localStorage.getItem("status")) {
-      return JSON.parse(localStorage.getItem("status")! || "");
-    } else return "";
-  });
+  const [role, setRole] = useState<string>("");
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
   const { setCurrentGame, setIsGuess } = useAppContext();
   const params = useParams();
@@ -220,11 +216,11 @@ export default function Page() {
     if (!choiceReceived) {
       console.log(choiceData);
       socket.emit("send_choice", choiceData);
-      setGenerataedData([]);
+      // setGenerataedData([]);
     } else {
       console.log(guessData);
       socket.emit("send_guess", guessData);
-      setGenerataedData([]);
+      // setGenerataedData([]);
     }
   };
   socket.on("myDM", (data) => {
