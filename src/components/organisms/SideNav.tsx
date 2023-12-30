@@ -6,6 +6,8 @@ import Popups from "../atoms/Popups";
 import Link from "next/link";
 import CreateGame from "./CreateGame";
 import { toast } from "react-toastify";
+import { socket } from "@/utils/service/constant";
+import { string } from "prop-types";
 import Image from "next/image";
 // import { useNavigate } from "react-router-dom";
 import { useRouter } from "next/navigation";
@@ -54,7 +56,14 @@ export default function SideNav() {
       </div>
 
       <button
-        onClick={() => setOpenLogout((prev) => !prev)}
+        onClick={() => {
+          setOpenLogout((prev) => !prev);
+          const me = typeof localStorage !== "undefined" && localStorage.getItem("home_player") ? JSON.parse(localStorage.getItem("home_player")!) : {username: "", id:""};
+          if(me){
+            socket.emit('logout', {player_id: me?.id});
+          }
+       
+        }}
         className="flex items-center justify-center  py-1 hover:bg-white duration-300  hover:text-themecolor w-full text-white gap-3 px-4"
       >
         <CiLogout /> <span>logout</span>
@@ -67,9 +76,15 @@ export default function SideNav() {
             content={"Are you sure you want to leave the Game?"}
             actionText={"Logout"}
             onCancel={() => setOpenLogout((prev) => !prev)}
-            onAction={() => {
+            onAction={() =>{
+             
+              const me = typeof localStorage !== "undefined" && localStorage.getItem("home_player") ? JSON.parse(localStorage.getItem("home_player")!) : {username: "", id:""};
+              if(me){
+                socket.emit('logout', {player_id: me?.id});
+              }
               localStorage.clear();
               router.replace("/");
+              setOpenLogout((prev) => !prev);
             }}
             styles={"bg-themecolor text-white rounded"}
             actionBTNStyle={"border border-red-600 text-red-600"}
