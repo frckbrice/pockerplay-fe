@@ -179,13 +179,10 @@ export default function Page() {
   socket.on("receive_choice", (data) => {
     if (data) {
       console.log("receive_choice: ", data);
-      if (data.role === "home_player") {
+     
         setGenerataedData(data.proposals);
-        setGuessPlayerHint(data.message);
-      } else if (data.role === "guess_player") {
-        setGenerataedData(data.proposals);
-        setHomePlayerHint(data.message);
-      }
+        setMessageHint(data.message);
+      
       setChoiceMadeId(data.choice);
       setCategory(data.category);
       setChoiceReceived(true);
