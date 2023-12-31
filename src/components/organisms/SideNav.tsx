@@ -11,9 +11,11 @@ import { string } from "prop-types";
 import Image from "next/image";
 // import { useNavigate } from "react-router-dom";
 import { useRouter } from "next/navigation";
+import { useAppContext } from "@/app/Context/AppContext";
 
 export default function SideNav() {
   const router = useRouter();
+  const { currentGame } = useAppContext();
   const [openLogout, setOpenLogout] = useState(false);
   const [startNewGame, setStartNewGame] = useState(false);
   if (typeof localStorage === "undefined") return;
@@ -58,11 +60,14 @@ export default function SideNav() {
       <button
         onClick={() => {
           setOpenLogout((prev) => !prev);
-          const me = typeof localStorage !== "undefined" && localStorage.getItem("home_player") ? JSON.parse(localStorage.getItem("home_player")!) : {username: "", id:""};
-          if(me){
-            socket.emit('logout', {player_id: me?.id});
+          const me =
+            typeof localStorage !== "undefined" &&
+            localStorage.getItem("home_player")
+              ? JSON.parse(localStorage.getItem("home_player")!)
+              : { username: "", id: "" };
+          if (me) {
+            socket.emit("logout", { player_id: me?.id });
           }
-       
         }}
         className="flex items-center justify-center  py-1 hover:bg-white duration-300  hover:text-themecolor w-full text-white gap-3 px-4"
       >
@@ -76,11 +81,17 @@ export default function SideNav() {
             content={"Are you sure you want to leave the Game?"}
             actionText={"Logout"}
             onCancel={() => setOpenLogout((prev) => !prev)}
-            onAction={() =>{
-             
-              const me = typeof localStorage !== "undefined" && localStorage.getItem("home_player") ? JSON.parse(localStorage.getItem("home_player")!) : {username: "", id:""};
-              if(me){
-                socket.emit('logout', {player_id: me?.id});
+            onAction={() => {
+              const me =
+                typeof localStorage !== "undefined" &&
+                localStorage.getItem("home_player")
+                  ? JSON.parse(localStorage.getItem("home_player")!)
+                  : { username: "", id: "" };
+              if (me) {
+                socket.emit("disconnected", {
+                  player_id: me?.id,
+                  gamesession_id: currentGame,
+                });
               }
               localStorage.clear();
               router.replace("/");
