@@ -51,7 +51,7 @@ export default function Page() {
   });
   const [round, setRound] = useState<Round>();
   const [homeChoice, setHomeChoice] = useState<string>("");
-  const [guessChoice, setGuessChoice] = useState<string>("");
+  const [playerChoice, setPlayerChoice] = useState<string>("");
   const [guessGuess, setGuessGuess] = useState<string>("?");
   const [generateStatus, setGenerateStatus] = useState<string>("");
   const [category, setCategory] = useState<string>("words");
@@ -193,9 +193,9 @@ export default function Page() {
       number_of_proposals: numberOfOptions,
       round_number: round?.round_number ? round?.round_number + 1 : 1,
     };
-    if (data.round_number > 5) {
+    if (data.round_number === 5) {
       setwinner(true);
-      data.round_number = 1;
+      // data.round_number = 1;
       return (
         <Popups
           title={"CONGRATULATIONS"}
@@ -235,8 +235,8 @@ export default function Page() {
       setGenerataedData(data.proposals);
 
       setMessageHint(data.message);
-
-      setChoiceMadeId(data.choice);
+      setPlayerChoice(data.choice);
+      setChoiceMadeId(data.choice_id);
       setCategory(data.category);
       setChoiceReceived(true);
       setRound(data.round);
@@ -279,6 +279,7 @@ export default function Page() {
       console.log(guessData);
       socket.emit("send_guess", guessData);
       setChoiceMadeId("");
+      setGuessGuess(playerChoice);
       return setChoiceReceived(false);
     } else {
       console.log(choiceData);
