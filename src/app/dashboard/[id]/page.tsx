@@ -216,6 +216,9 @@ export default function Page() {
   socket.on("receive_guess", (data) => {
     if (data) {
       console.log("receive_guess: ", data);
+      // if (choiceMadeId || choiceReceived) {
+      //   setGuessGuess(playerChoice);
+      // } else
       setGuessGuess(data.guess);
       setScore(data.score);
       setCategory(data.category);
@@ -228,6 +231,9 @@ export default function Page() {
     }
   });
 
+  console.log("choice received: ", playerChoice);
+  console.log(choiceMadeId, choiceReceived);
+
   socket.on("receive_choice", (data) => {
     if (data) {
       console.log("receive_choice: ", data);
@@ -235,8 +241,8 @@ export default function Page() {
       setGenerataedData(data.proposals);
 
       setMessageHint(data.message);
-      setPlayerChoice(data.choice);
-      setChoiceMadeId(data.choice_id);
+      setPlayerChoice(data.choiceData);
+      setChoiceMadeId(data.choice);
       setCategory(data.category);
       setChoiceReceived(true);
       setRound(data.round);
@@ -279,11 +285,14 @@ export default function Page() {
       console.log(guessData);
       socket.emit("send_guess", guessData);
       setChoiceMadeId("");
-      setGuessGuess(playerChoice);
+      // setGuessGuess(playerChoice);
       return setChoiceReceived(false);
     } else {
       console.log(choiceData);
-      return socket.emit("send_choice", choiceData);
+      if (!choiceData.player_choice || !choiceData.proposals) {
+        console.log(" no player choice or proposal");
+        return;
+      } else return socket.emit("send_choice", choiceData);
     }
   };
   socket.on("myDM", (data) => {
