@@ -203,10 +203,6 @@ export default function Page() {
     }
   });
 
-  // console.log("playerChoice", playerChoice);
-  // console.log("choiceMadeId", choiceMadeId);
-  // console.log("guessGuess:", guessGuess);
-
   socket.on("receive_choice", (data) => {
     if (data) {
       console.log("receive_choice: ", data);
