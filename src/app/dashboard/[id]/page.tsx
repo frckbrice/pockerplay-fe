@@ -193,6 +193,7 @@ export default function Page() {
       setEndOfRound(true);
     }
   });
+  console.log(guessGuess)
   socket.on("receive_choice", (data) => {
     if (data) {
       console.log("receive_choice: ", data);
@@ -238,13 +239,12 @@ export default function Page() {
       category,
     };
 
-    if (choiceMadeId && choiceReceived) {
+    if (choiceMadeId || choiceReceived) {
       console.log(guessData);
       socket.emit("send_guess", guessData);
-
+      setChoiceMadeId("");
       return setChoiceReceived(false);
-    }
-    if (!choiceReceived) {
+    }else {
       console.log(choiceData);
       return socket.emit("send_choice", choiceData);
     }
