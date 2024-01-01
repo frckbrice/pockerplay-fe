@@ -51,7 +51,8 @@ export default function Page() {
     } else return null;
   });
   const [round, setRound] = useState<Round>();
-  const [homeChoice, setHomeChoice] = useState<string>("");
+  // const [homeChoice, setHomeChoice] = useState<string>("");
+  // const [homeChoice, setHomeChoice] = useState<string>("");
   const [playerChoice, setPlayerChoice] = useState<string>("");
   const [guessGuess, setGuessGuess] = useState<string>("?");
   const [generateStatus, setGenerateStatus] = useState<string>("");
@@ -103,6 +104,7 @@ export default function Page() {
       });
     }
     socket.on("connection", () => {
+      setGenerateStatus("🟢 ");
       console.log("socket connected successfully");
     });
 
@@ -112,6 +114,7 @@ export default function Page() {
 
     socket.on("disconnect", () => {
       console.log("close");
+      setGenerateStatus("🔴 Gateway closed");
       setTimeout(() => socket.connect(), 100);
     });
   }, [
@@ -125,8 +128,9 @@ export default function Page() {
   ]);
 
   useEffect(() => {
-    if (guessReceived && choiceReceived) setEndOfRound(true);
-  }, [guessReceived, choiceReceived]);
+    if (guessReceived && choiceReceived && selectedCard === guessGuess)
+      setEndOfRound(true);
+  }, [guessReceived, choiceReceived, selectedCard, guessGuess]);
 
   socket.on("round", (data) => {
     if (data) {
@@ -175,7 +179,7 @@ export default function Page() {
       round_number: round && roundCounter == 2 ? round?.round_number + 1 : 1,
     };
 
-    if(roundCounter == 2) setRoundCounter(0);
+    if (roundCounter == 2) setRoundCounter(0);
 
     socket.emit("generate", data);
   };
@@ -183,15 +187,24 @@ export default function Page() {
   socket.on("receive_guess", (data) => {
     if (data) {
       console.log("receive_guess: ", data);
-      if (playerChoice) {
-        setTimeout(() => setGuessGuess(playerChoice), 2000);
-      } else setGuessGuess(data.guess);
+      if (data.role === role) {
+        setTimeout(() => {
+          setGuessGuess(playerChoice);
+        }, 2000);
+      } else{
+        setRoundCounter((prev) => prev + 1);
+        setGuessGuess(data.guess);
+      } 
       setScore(data.score);
       setCategory(data.category);
       setGuessReceived(true);
-      setRoundCounter((prev) => prev + 1);
+     
     }
   });
+
+  // console.log("playerChoice", playerChoice);
+  // console.log("choiceMadeId", choiceMadeId);
+  // console.log("guessGuess:", guessGuess);
 
   socket.on("receive_choice", (data) => {
     if (data) {
@@ -200,12 +213,16 @@ export default function Page() {
       setGenerataedData(data.proposals);
 
       setMessageHint(data.message);
-      setPlayerChoice(data.choiceData);
-      setChoiceMadeId(data.choice);
+      if (data.role !== role) {
+        setPlayerChoice(data.choiceData);
+        setChoiceMadeId(data.choice);
+        setRoundCounter((prev) => prev + 1);
+      }
+
       setCategory(data.category);
       setChoiceReceived(true);
       setRound(data.round);
-      setRoundCounter((prev) => prev + 1);
+     
     }
   });
 
@@ -246,14 +263,19 @@ export default function Page() {
       socket.emit("send_guess", guessData);
       setChoiceMadeId("");
       return setChoiceReceived(false);
-    }else {
+    } else {
       console.log(choiceData);
       if (!choiceData.player_choice || !choiceData.proposals) {
         console.log(" no player choice or proposal");
         return;
       } else {
-        setPlayerChoice("");
-        return socket.emit("send_choice", choiceData);
+        socket.emit("send_choice", choiceData);
+        setGuessGuess("");
+        setTimeout(() => {
+          setChoiceMadeId("");
+          setPlayerChoice("");
+          // setGuessGuess("");
+        }, 1000);
       }
     }
   };
@@ -295,6 +317,7 @@ export default function Page() {
     setSelectedCard("");
     setGuessGuess("");
     setGenerataedData([]);
+    setGenerateStatus("");
     router.refresh();
   };
 

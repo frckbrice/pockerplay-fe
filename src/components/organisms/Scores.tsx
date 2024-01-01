@@ -17,8 +17,7 @@ export default function Scores(props: Props) {
         </div>
         <div>
           <p>
-            {props.score?.home_player_score ?? "0"} : 
-            {props.score?.guess_player_score ?? "0"}
+            {props.score?.home_player_score ?? "0"} : {props.score?.guess_player_score ?? "0"}
           </p>
         </div>
         <div className="flex flex-col items-center justify-center">
