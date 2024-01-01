@@ -50,9 +50,7 @@ export default function Page() {
       return JSON.parse(localStorage.getItem("guess_player") || "{}");
     } else return null;
   });
-  const [round, setRound] = useState<Round>();
-  // const [homeChoice, setHomeChoice] = useState<string>("");
-  // const [homeChoice, setHomeChoice] = useState<string>("");
+  const [round, setRound] = useState<Round>();  const [conClose, setconClose] = useState<boolean>(false);
   const [playerChoice, setPlayerChoice] = useState<string>("");
   const [guessGuess, setGuessGuess] = useState<string>("?");
   const [generateStatus, setGenerateStatus] = useState<string>("");
@@ -70,6 +68,7 @@ export default function Page() {
       return localStorage.getItem("status");
     }
   });
+  const [constatus, setConStatus] = useState<string>("");
   const [choiceMadeId, setChoiceMadeId] = useState<string>("");
   const { setCurrentGame, isguess, setIsGuess } = useAppContext();
   const params = useParams();
@@ -103,18 +102,18 @@ export default function Page() {
         gamesession_id: params.id,
       });
     }
+
     socket.on("connection", () => {
-      setGenerateStatus("🟢 ");
+      setConStatus("🟢  link open ");
       console.log("socket connected successfully");
     });
-
     socket.on("error", (err: Error) => {
       console.log("error", err);
     });
-
     socket.on("disconnect", () => {
       console.log("close");
-      setGenerateStatus("🔴 Gateway closed");
+      setconClose(true);
+      setGenerateStatus("🔴 link close. retrying...");
       setTimeout(() => socket.connect(), 100);
     });
   }, [
@@ -191,14 +190,13 @@ export default function Page() {
         setTimeout(() => {
           setGuessGuess(playerChoice);
         }, 2000);
-      } else{
+      } else {
         setRoundCounter((prev) => prev + 1);
         setGuessGuess(data.guess);
-      } 
+      }
       setScore(data.score);
       setCategory(data.category);
       setGuessReceived(true);
-     
     }
   });
 
@@ -222,7 +220,6 @@ export default function Page() {
       setCategory(data.category);
       setChoiceReceived(true);
       setRound(data.round);
-     
     }
   });
 
@@ -382,8 +379,12 @@ export default function Page() {
               <option value="10">10</option>
             </select>
           </div>
-          <div className=" mx-auto text-xs text-red-700">
-            <span>{generateStatus} </span>
+          <div className=" mx-auto ">
+            {conClose ? (
+              <span className="text-xs text-red-700">{generateStatus} </span>
+            ) : (
+              <span className="text-xs text-green-700">{constatus} </span>
+            )}
           </div>
           <div>
             <button
