@@ -4,15 +4,22 @@ import CopyToClipboard from "react-copy-to-clipboard";
 type Props = {
   gameUrl: string;
   handleCopy: () => void;
-  image: string;
 };
 
-const Copy = ({ gameUrl, handleCopy, image }: Props) => {
+const Copy = ({ gameUrl, handleCopy }: Props) => {
   return (
-    <div className={image ? "hidden" : "block"}>
+    <section
+      ref={(node) => {
+        if (node) {
+          node.addEventListener("click", () => {
+            node.style.display = "none";
+          });
+        }
+      }}
+    >
       <CopyToClipboard text={gameUrl} onCopy={handleCopy}>
         <button
-          // onClick={handleCopy}
+          onClick={handleCopy}
           className="flex gap-1  items-center p-2  text-green-600"
         >
           <span className="text-green-600">
@@ -20,7 +27,7 @@ const Copy = ({ gameUrl, handleCopy, image }: Props) => {
           </span>
         </button>
       </CopyToClipboard>
-    </div>
+    </section>
   );
 };
 

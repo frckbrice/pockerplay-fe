@@ -24,6 +24,7 @@ import Overlay from "@/components/atoms/Overlay";
 import { Socket } from "socket.io-client";
 import CardGuess from "@/components/atoms/CardGuess";
 import { RiRoundedCorner } from "react-icons/ri";
+import RoundLoader from "@/components/atoms/RoundLoader";
 
 export default function Page() {
   const router = useRouter();
@@ -58,8 +59,8 @@ export default function Page() {
   const [generateStatus, setGenerateStatus] = useState<string>("");
   const [category, setCategory] = useState<string>("words");
   const [numberOfOptions, setNumberOfOptions] = useState<number>(5);
-  const [homeplayerHint, setHomePlayerHint] = useState<string>("");
-  const [guessPlayerHint, setGuessPlayerHint] = useState<string>("");
+  const [generate, setGenerate] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
   const [messagehint, setMessageHint] = useState<string>("");
   const [gameUrl, setGameUrl] = useState<string>("");
   const [choiceReceived, setChoiceReceived] = useState<boolean>(false);
@@ -79,6 +80,8 @@ export default function Page() {
   const [EndOfRound, setEndOfRound] = useState(false);
   const [roundCounter, setRoundCounter] = useState<number>(0);
   const [whoPlays, setWhoPlays] = useState<string>("");
+  const [stats, setStats] = useState([]);
+
   useEffect(() => {
     if (
       !homePlayer?.id ||
@@ -92,7 +95,7 @@ export default function Page() {
       return router.push("/verification");
     }
 
-    if (!isguess) setGameUrl(`"${public_call}/dashboard/${params.id}"`);
+    if (!isguess) setGameUrl(`${public_call}/dashboard/${params.id}`);
 
     if (homePlayer) {
       socket.emit("joingame", {
@@ -137,6 +140,7 @@ export default function Page() {
 
   socket.on("round", (data) => {
     if (data) {
+      setGenerate(false);
       setRound(data.round);
       if (data.proposals.length) setGenerataedData(data.proposals);
       else {
@@ -145,10 +149,13 @@ export default function Page() {
     }
   });
 
+  console.log(stats);
+
   socket.on("notify", (data) => {
     if (data) {
       // console.log("notify: ", data);
       if (data.guessPlayer) {
+        handleCopy();
         console.log("guess player connected: ", data);
         if (data.homePlayer.id === homePlayer.id) {
           console.log("i am the home player");
@@ -159,7 +166,10 @@ export default function Page() {
           setGuessPlayer(data.guessPlayer);
           setRole("home_player");
           localStorage.setItem("status", "home_player");
-          localStorage.setItem("conStatus", data.notify + " home_player");
+          localStorage.setItem(
+            "conStatus",
+            data.notify + " guess_player connected"
+          );
         } else {
           localStorage.setItem("home_player", JSON.stringify(data.guessPlayer));
           setHomePlayer(data.guessPlayer);
@@ -167,65 +177,75 @@ export default function Page() {
           setGuessPlayer(data.homePlayer);
           setRole("guess_player");
           localStorage.setItem("status", "guess_player");
-          localStorage.setItem("conStatus", data.notify + " guess_player");
+          localStorage.setItem(
+            "conStatus",
+            data.notify + " home_player connected"
+          );
         }
       }
     }
   });
   // console.log(role);
   const handleGenerate = () => {
+    setGenerate(true);
     const data = {
       home_player_id: homePlayer.id,
       gamesession_id: params.id,
       category,
       number_of_proposals: numberOfOptions,
-      round_number: round && roundCounter == 2 ? round?.round_number + 1 : 1,
+      round_number: round && roundCounter === 2 ? round?.round_number + 1 : 1,
     };
-    roundCounter == 2 ? setRoundCounter(0) : setRoundCounter(roundCounter);
+
     socket.emit("generate", data);
+    if (roundCounter) setRoundCounter(0);
     setGenerateStatus("");
   };
+
+  console.log(roundCounter);
+  // console.log(round);
 
   socket.on("receive_guess", (data) => {
     if (data) {
       console.log("receive_guess: ", data);
+      console.log("i am the one outside: ", data.role);
+      if (data.stats.length) setStats(data.stats);
       if (data.role === role) {
+        console.log("am the one inside: ", data.role);
         setWhoPlays("guess_player");
+        setRoundCounter(2);
         setTimeout(() => setGuessGuess(playerChoice), 2000);
       } else {
-        setGuessGuess(data.guess);
+        setTimeout(() => setGuessGuess(data.guess), 2000);
         setWhoPlays("home_player");
-        setRoundCounter((prev) => prev + 1);
+        setGuessReceived(true);
       }
       setScore(data.score);
       setCategory(data.category);
-      setGuessReceived(true);
     }
   });
-
+  console.log(role);
   socket.on("receive_choice", (data) => {
     if (data) {
       console.log("receive_choice: ", data);
 
-      setGenerataedData(data.proposals);
-
-      setMessageHint(data.message);
       if (data.role !== role) {
         setPlayerChoice(data.choiceData);
         setChoiceMadeId(data.choice);
-        setRoundCounter((prev) => prev + 1);
+        setChoiceReceived(true);
         setWhoPlays("home_player");
+      } else {
+        setRoundCounter(1);
+        setWhoPlays("guess_player");
       }
-      setCategory(data.category);
-      setChoiceReceived(true);
       setRound(data.round);
-
-      setWhoPlays("guess_player");
+      setGenerataedData(data.proposals);
+      setCategory(data.category);
+      setMessageHint(data.message);
     }
   });
 
-  // console.log(category, round);
-  // console.log(choiceReceived, choiceMadeId);
+  // console.log(roundCounter);
+  // console.log(choiceReceived, guessReceived);
 
   const sendChoiceOrGuess = () => {
     if (!role || !round || !homePlayer || !guessPlayer) {
@@ -256,8 +276,13 @@ export default function Page() {
       category,
     };
 
+    // if (!guessData.choice_id) {
+    //   setGenerateStatus("NO OPTIONS RECEIVED. Please generate a new options");
+    //   return;
+    // }
     if (choiceMadeId || choiceReceived) {
       console.log(guessData);
+
       socket.emit("send_guess", guessData);
       setChoiceMadeId("");
       // setGuessGuess(playerChoice);
@@ -290,6 +315,7 @@ export default function Page() {
       hideProgressBar: true,
       autoClose: 3000,
     });
+    setCopied(true);
   };
   socket.on("endGame", (data) => {
     console.log("endGame: ", data);
@@ -368,7 +394,8 @@ export default function Page() {
               <span className="text-xs text-green-700">{constatus} </span>
             )}
           </div>
-          <div>
+          <div className=" flex items-center">
+            {generate && <RoundLoader />}
             <button
               onClick={clearspace}
               className=" border rounded-md mobile:max-sm:h-[4rem] border-themecolor hover:bg-themecolor hover:text-white transition-all duration-300 text-themecolor p-2 m-2"
@@ -388,8 +415,8 @@ export default function Page() {
           <div className="flex flex-col justify-center items-center w-fit">
             {whoPlays === "home_player" ? (
               <span className=" text-themecolor">
-                <span className=" text-themecolor-900 text-[25px]">👇🏿</span> you
-                play
+                <span className="wave  text-[30px]">👇🏿</span>
+                you play
               </span>
             ) : (
               ""
@@ -407,23 +434,41 @@ export default function Page() {
           </div>
 
           <div className="flex gap-3 items-center justify-center">
-            {!guessPlayer?.id && (
-              <Copy
-                gameUrl={gameUrl}
-                handleCopy={handleCopy}
-                image={selectedCard}
-              />
-            )}
+            {/* <Copy gameUrl={gameUrl} handleCopy={handleCopy} /> */}
+            <section
+              ref={(node) => {
+                if (node) {
+                  node.addEventListener("click", () => {
+                    node.style.display = "none";
+                  });
+                }
+              }}
+            >
+              <CopyToClipboard text={gameUrl} onCopy={handleCopy}>
+                <button
+                  onClick={handleCopy}
+                  className="flex gap-1  items-center p-2  text-green-600"
+                >
+                  <span className="text-green-600">
+                    {gameUrl ? gameUrl : "link to share"}
+                  </span>
+                </button>
+              </CopyToClipboard>
+            </section>
 
-            {result(selectedCard, guessGuess) ? (
-              <span>
-                <FcCloseUpMode
-                  size={50}
-                  className="text-green-800 w-full mx-auto"
-                />{" "}
-              </span>
-            ) : (
-              <GrClose size={50} className="text-red-800 w-full mx-auto" />
+            {copied && (
+              <div>
+                {result(selectedCard, guessGuess) ? (
+                  <span>
+                    <FcCloseUpMode
+                      size={50}
+                      className="text-green-800 w-full mx-auto"
+                    />
+                  </span>
+                ) : (
+                  <GrClose size={50} className="text-red-800 w-full mx-auto" />
+                )}
+              </div>
             )}
           </div>
 
@@ -431,7 +476,7 @@ export default function Page() {
             {whoPlays === "guess_player" ? (
               <span className=" text-themecolor">
                 {" "}
-                <span className=" text-[25px]">👇🏿</span> is playing
+                <span className="wave text-[30px]">👇🏿</span> turn to play
               </span>
             ) : (
               ""
@@ -460,7 +505,7 @@ export default function Page() {
         </div>
         {/* ###### Cards section ##### */}
         <div className=" my-2 py-2 mx-auto">
-          {homePlayer ? guessPlayerHint : guessPlayer ? homeplayerHint : null}
+          {/* {homePlayer ? guessPlayerHint : guessPlayer ? homeplayerHint : null} */}
         </div>
         <textarea
           className="h-[10vh] outline-none border border-gray-300 p-2 text-xs"
@@ -551,6 +596,21 @@ export default function Page() {
           />
         </>
       )}
+
+      {/* {EndOfRound && (
+        <>
+          <Overlay onClick={() => setEndOfRound((prev) => !prev)} transparent />
+          <Popups
+            title={"Round end"}
+            content={"you won"}
+            actionText={</>}
+            onCancel={() => setEndOfRound((prev) => !prev)}
+            onAction={() => setEndOfRound((prev) => !prev)}
+            styles={"bg-themecolor text-white"}
+            actionBTNStyle={""}
+          />
+        </>
+      )} */}
     </main>
   );
 }
