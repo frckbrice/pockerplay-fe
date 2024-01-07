@@ -37,6 +37,7 @@ type GameSession = {
   guess_player_score: number;
   user?: User;
   rounds?: Round[];
+  role: string;
 };
 
 type Choice = {
@@ -65,4 +66,15 @@ type Guess = {
   user?: User;
   round?: Round;
   choice?: Choice;
+};
+
+type StatType = {
+  choice_id: string;
+  guess_player_guess: string;
+  home_player_choice: string;
+  home_player_score: number;
+  round: string;
+  guess_player_choice: string;
+  home_player_guess: string;
+  guess_player_score: number;
 };

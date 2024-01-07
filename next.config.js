@@ -6,6 +6,19 @@ const nextConfig = {
     register: true,
     skipWaiting: true,
   }),
+  images: {
+    remotePatterns: [
+      {
+        hostname: "loremflickr.com",
+      },
+      {
+        hostname: "picsum.photos",
+      },
+      {
+        hostname: "www.google.com",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

@@ -68,6 +68,7 @@ export default function SideNav() {
           if (me) {
             socket.emit("logout", { player_id: me?.id });
           }
+          localStorage.clear();
         }}
         className="flex items-center justify-center  py-1 hover:bg-white duration-300  hover:text-themecolor w-full text-white gap-3 px-4"
       >
@@ -82,18 +83,6 @@ export default function SideNav() {
             actionText={"Logout"}
             onCancel={() => setOpenLogout((prev) => !prev)}
             onAction={() => {
-              const me =
-                typeof localStorage !== "undefined" &&
-                localStorage.getItem("home_player")
-                  ? JSON.parse(localStorage.getItem("home_player")!)
-                  : { username: "", id: "" };
-              if (me) {
-                socket.emit("disconnected", {
-                  player_id: me?.id,
-                  gamesession_id: currentGame,
-                });
-              }
-              localStorage.clear();
               router.replace("/");
               setOpenLogout((prev) => !prev);
             }}

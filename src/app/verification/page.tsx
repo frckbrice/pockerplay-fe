@@ -15,9 +15,6 @@ import { useAppContext } from "../Context/AppContext";
 export default function Verification() {
   const router = useRouter();
   const [name, setName] = useState<string>("");
-  // const [userData, setUserData] = useState<Partial<User>>();
-  // const currentGame =
-  // typeof localStorage !== "undefined" &&  localStorage.getItem("currentGameSession") ? localStorage.getItem("currentGameSession") : undefined;
 
   const { currentGame, setIsGuess } = useAppContext();
 
@@ -29,15 +26,11 @@ export default function Verification() {
 
     if (name) {
       const data = { username: name };
-      console.log("data", data);
       const user = await signupFn(data);
       if (user) {
-        console.log(user);
-        // setUserData(user);
-
         localStorage.setItem("home_player", JSON.stringify(user));
         if (currentGame) {
-          setIsGuess(false);
+          // setIsGuess(false);
           return router.push(`/dashboard/${currentGame}`);
         }
         console.log("not current game");
@@ -76,10 +69,6 @@ export default function Verification() {
 
             <button
               className="bg-themecolor bigScreen:text-[40px] text-white py-2 px-8 mobile:max-sm:w-full"
-              // onClick={() => {
-              //   setIsLoading((prev) => !prev);
-              //   if (userData) router.push("/dashboard");
-              // }}
               onKeyDown={handleKeyDown}
             >
               Continue
