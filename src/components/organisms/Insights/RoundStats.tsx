@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { Fragment } from "react";
 
 type Props = {
   gameList: StatType[];
@@ -13,7 +13,7 @@ const RoundStats = ({ gameList, homePlayer, guessPlayer }: Props) => {
     <table className="table-auto w-[700px] h-[100px] mx-auto  bg-themecolor text-white content-center border-separate border-spacing-2 border border-slate-400 px-5 py-2">
       <thead>
         <tr>
-          <th className=" border-r border-slate-300 ">Rounds</th>
+          <th className=" border-r border-slate-300 ">Parts</th>
           <th className="border-r border-slate-300 ">{homePlayer?.username}</th>
           <th className="border-r border-slate-300 ">Choices/guesses</th>
           <th className="border-r border-slate-300 ">
@@ -25,11 +25,11 @@ const RoundStats = ({ gameList, homePlayer, guessPlayer }: Props) => {
       </thead>
       <tbody>
         {gameList?.map((game) => (
-          <div key={game.choice_id}>
+          <Fragment key={game.choice_id}>
             <tr>
-              <td className="px-8 py-4">First</td>
-              <td className="px-8 py-4">{game.home_player_score ?? 0}</td>
-              <td className="px-8 py-4">
+              <td className="px-8 py-4 w-fit">First</td>
+              <td className="px-8 py-4 w-fit">{game.home_player_score ?? 0}</td>
+              <td className="px-8 py-4 w-fit">
                 <Image
                   src={
                     game.home_player_choice ||
@@ -40,8 +40,10 @@ const RoundStats = ({ gameList, homePlayer, guessPlayer }: Props) => {
                   height="50"
                 />
               </td>
-              <td className="px-8 py-4">{game?.guess_player_choice ?? 0}</td>
-              <td className="px-8 py-4">
+              <td className="px-8 py-4 w-fit">
+                {game?.guess_player_score ?? 0}
+              </td>
+              <td className="px-8 py-4 w-fit">
                 <Image
                   src={
                     game.guess_player_guess ||
@@ -55,9 +57,9 @@ const RoundStats = ({ gameList, homePlayer, guessPlayer }: Props) => {
             </tr>
 
             <tr>
-              <td className="px-8 py-4">Second : </td>
-              <td className="px-8 py-4">{game.home_player_score ?? 0}</td>
-              <td className="px-8 py-4">
+              <td className="px-8 py-4 w-fit">Second </td>
+              <td className="px-8 py-4 w-fit">{game.home_player_score ?? 0}</td>
+              <td className="px-8 py-4 w-fit">
                 {" "}
                 <Image
                   src={
@@ -69,8 +71,10 @@ const RoundStats = ({ gameList, homePlayer, guessPlayer }: Props) => {
                   height="50"
                 />
               </td>
-              <td className="px-8 py-4">{game?.guess_player_score ?? 0}</td>
-              <td className="px-8 py-4">
+              <td className="px-8 py-4 w-fit">
+                {game?.guess_player_score ?? 0}
+              </td>
+              <td className="px-8 py-4 w-fit">
                 <Image
                   src={
                     game?.guess_player_choice ||
@@ -82,7 +86,7 @@ const RoundStats = ({ gameList, homePlayer, guessPlayer }: Props) => {
                 />
               </td>
             </tr>
-          </div>
+          </Fragment>
         ))}
       </tbody>
     </table>
