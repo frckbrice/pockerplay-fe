@@ -33,6 +33,10 @@ const Statistics = ({ data, game }: Props) => {
 
   return (
     <div className=" w-[700px] h-auto mx-auto flex flex-col items-center ">
+      <div className=" w-full flex justify-center items-center">
+        {" "}
+        END OF GAME: SUMMARY
+      </div>
       <RoundStats
         homePlayer={homePlayer}
         guessPlayer={guessPlayer}
@@ -41,20 +45,24 @@ const Statistics = ({ data, game }: Props) => {
       <div className=" w-full h-auto p-5 mt-4 flex justify-start items-center flex-col text-lg">
         <div>
           <span>WINNER: &nbsp;&nbsp; </span>
-          <span>{game?.winner}</span> {/* TAMO */}
+          <span>
+            {game?.home_player_score > game.guess_player_score
+              ? homePlayer.username
+              : guessPlayer.username}
+          </span>
         </div>
         {game.winner ? (
           <div className=" flex flex-col gap-3 items-center">
             <div>
               <span>ROLE: &nbsp;&nbsp; </span>{" "}
-              {game.winner === homePlayer.username
+              {game?.home_player_score > game.guess_player_score
                 ? "home_player"
                 : "guess_player"}
             </div>
             <div>
               {" "}
               <span>SCORE: &nbsp;&nbsp; </span>
-              {game.winner === homePlayer.username
+              {game?.home_player_score > game?.guess_player_score
                 ? game?.home_player_score
                 : game?.guess_player_score}
             </div>
@@ -75,7 +83,7 @@ const Statistics = ({ data, game }: Props) => {
           </div>
         )}
       </div>
-      <div className=" w-full h-auto p-5 mt-4 flex justify-start items-center flex-col text-lg">
+      <div className=" w-full h-auto p-5 mt-2.5 flex justify-start items-center flex-col text-lg">
         <button
           onClick={() => {
             const me =
@@ -89,7 +97,7 @@ const Statistics = ({ data, game }: Props) => {
             localStorage.clear();
             router.push("/");
           }}
-          className="flex items-center justify-center  py-1 hover:bg-white duration-300  hover:text-themecolor w-full text-white gap-3 px-4"
+          className="flex items-center justify-center  py-1 hover:bg-themecolor duration-300  hover:text-white w-full text-black gap-3 px-4 ring ring-slate-700"
         >
           <span>Restart</span>
         </button>

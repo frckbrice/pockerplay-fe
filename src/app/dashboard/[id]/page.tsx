@@ -154,8 +154,9 @@ export default function Page() {
   console.log("first: ", stats);
 
   socket.on("sending", (data) => {
-    if (data && data.player_id == guessPlayer?.id && data.role !== role) {
-      setGuess_player_Sending(data.text);
+    if (data) {
+      if (data.role === role) setGuess_player_Sending("");
+      else setGuess_player_Sending(data.text);
     }
   });
 
