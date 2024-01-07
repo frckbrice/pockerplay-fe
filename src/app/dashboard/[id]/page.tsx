@@ -113,7 +113,7 @@ export default function Page() {
       });
     }
     socket.on("connection", () => {
-      setConStatus("🟢 connected ");
+      setConStatus("🟢 link open ");
       setconClose(false);
       console.log("socket connected successfully");
     });
@@ -151,8 +151,8 @@ export default function Page() {
     }
   });
 
-  console.log("first: ", stats);
-  console.log(homePlayer.id)
+  //console.log("first: ", stats);
+  //console.log(homePlayer.id)
 
   socket.on("sending", (data) => {
     if(data) {
