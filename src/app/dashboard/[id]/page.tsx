@@ -219,6 +219,7 @@ export default function Page() {
         setWhoPlays("home_player");
         setRoundCounter(2);
         setTimeout(() => setGuessGuess(playerChoice), 2000);
+        setGuess_player_Sending("");
       } else {
         setTimeout(() => setGuessGuess(data.guess), 2000);
         setWhoPlays("guess_player");
@@ -243,6 +244,7 @@ export default function Page() {
       } else {
         setRoundCounter(1);
         setWhoPlays("guess_player");
+        setGuess_player_Sending("");
       }
       setRound(data.round);
       setGenerataedData(data.proposals);
