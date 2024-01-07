@@ -113,7 +113,7 @@ export default function Page() {
       });
     }
     socket.on("connection", () => {
-      setConStatus("🟢 link open ");
+      setConStatus("🟢 connected ");
       setconClose(false);
       console.log("socket connected successfully");
     });
@@ -125,7 +125,7 @@ export default function Page() {
     socket.on("disconnect", () => {
       console.log("close");
       setconClose(true);
-      setGenerateStatus("🔴 link close. retrying...");
+      setGenerateStatus("🔴 connection close. retrying...");
       setTime = setTimeout(() => socket.connect(), 100);
     });
     return () => clearTimeout(setTime);
