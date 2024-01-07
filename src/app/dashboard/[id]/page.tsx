@@ -206,7 +206,7 @@ export default function Page() {
     };
 
     socket.emit("generate", data);
-    if (roundCounter) setRoundCounter(0);
+    if (roundCounter === 2) setRoundCounter(0);
     setGenerateStatus("");
   };
 
