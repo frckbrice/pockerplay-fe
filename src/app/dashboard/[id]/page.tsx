@@ -336,7 +336,7 @@ export default function Page() {
   const result = (str1: string, str2: string) => {
     if (
       (selectedCard !== "?" && guessGuess !== "?") ||
-      (!selectedCard && guessGuess && guessGuess === selectedCard)
+      (selectedCard && guessGuess && guessGuess === selectedCard)
     )
       return selectedCard === guessGuess;
     else if (choiceReceived || !generateStatus) return false;
