@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import RoundStats from "./RoundStats";
 import { socket } from "@/utils/service/constant";
+import { useRouter } from "next/navigation";
 
 type Props = {
   data: StatType[];
@@ -8,6 +9,7 @@ type Props = {
 };
 
 const Statistics = ({ data, game }: Props) => {
+  const router = useRouter();
   const [homePlayer, setHomePlayer] = useState<User>(() => {
     if (typeof localStorage !== "undefined") {
       return (
@@ -85,6 +87,7 @@ const Statistics = ({ data, game }: Props) => {
               socket.emit("logout", { player_id: me?.id });
             }
             localStorage.clear();
+            router.push("/");
           }}
           className="flex items-center justify-center  py-1 hover:bg-white duration-300  hover:text-themecolor w-full text-white gap-3 px-4"
         >
