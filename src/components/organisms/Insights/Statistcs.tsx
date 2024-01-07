@@ -33,7 +33,7 @@ const Statistics = ({ data, game }: Props) => {
 
   return (
     <div className=" w-[700px] h-auto mx-auto flex flex-col items-center ">
-      <div className=" w-full flex justify-center items-center">
+      <div className=" w-full flex justify-center items-center mb-4 p-2.5">
         {" "}
         END OF GAME: SUMMARY
       </div>
