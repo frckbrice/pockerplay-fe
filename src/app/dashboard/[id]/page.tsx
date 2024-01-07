@@ -125,7 +125,7 @@ export default function Page() {
     socket.on("disconnect", () => {
       console.log("close");
       setconClose(true);
-      setGenerateStatus("🔴 link close. retrying...");
+      setGenerateStatus("🔴 connection close. retrying...");
       setTime = setTimeout(() => socket.connect(), 100);
     });
     return () => clearTimeout(setTime);
@@ -151,21 +151,19 @@ export default function Page() {
     }
   });
 
-  console.log("first: ", stats);
-
   socket.on("sending", (data) => {
     if (data) {
-      if (data.role === role) setGuess_player_Sending("");
-      else setGuess_player_Sending(data.text);
+      if (data.role === role) {
+        setGuess_player_Sending("");
+      } else setGuess_player_Sending(data.text);
     }
   });
 
   socket.on("notify", (data) => {
     if (data) {
-      // console.log("notify: ", data);
       if (data.guessPlayer) {
         handleCopy("Guess player connected");
-        // console.log("guess player connected: ", data);
+
         if (data.homePlayer.id === homePlayer.id) {
           console.log("i am the home player");
           localStorage.setItem(
@@ -220,6 +218,7 @@ export default function Page() {
         setWhoPlays("home_player");
         setRoundCounter(2);
         setTimeout(() => setGuessGuess(playerChoice), 2000);
+        setGuess_player_Sending("");
       } else {
         setTimeout(() => setGuessGuess(data.guess), 2000);
         setWhoPlays("guess_player");
@@ -244,6 +243,7 @@ export default function Page() {
       } else {
         setRoundCounter(1);
         setWhoPlays("guess_player");
+        setGuess_player_Sending("");
       }
       setRound(data.round);
       setGenerataedData(data.proposals);
