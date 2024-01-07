@@ -155,7 +155,7 @@ export default function Page() {
 
   socket.on("sending", (data) => {
     if(data) {
-      if(data.role === role)
+      if(data.player_id === homePlayer.id && data.role === role)
         setGuess_player_Sending("")
       else setGuess_player_Sending(data.text)
     }
