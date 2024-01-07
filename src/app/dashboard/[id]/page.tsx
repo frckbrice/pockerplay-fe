@@ -100,7 +100,7 @@ export default function Page() {
       return router.push("/verification");
     }
 
-    if (!currentGame) setGameUrl(`https://pkplay.vercel.app/dashboard/${params.id}`);
+    if (!currentGame) setGameUrl(`${api_call}/dashboard/${params.id}`);
 
     if (homePlayer) {
       socket.emit("joingame", {
