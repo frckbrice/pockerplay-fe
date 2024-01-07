@@ -151,24 +151,19 @@ export default function Page() {
     }
   });
 
-  //console.log("first: ", stats);
-  //console.log(homePlayer.id)
-
   socket.on("sending", (data) => {
-    if(data) {
-      console.log(homePlayer.id===data.player_id)
-      if(data.role === role ){setGuess_player_Sending("")}
-        
-      else setGuess_player_Sending(data.text)
+    if (data) {
+      if (data.role === role) {
+        setGuess_player_Sending("");
+      } else setGuess_player_Sending(data.text);
     }
   });
 
   socket.on("notify", (data) => {
     if (data) {
-      // console.log("notify: ", data);
       if (data.guessPlayer) {
         handleCopy("Guess player connected");
-        // console.log("guess player connected: ", data);
+
         if (data.homePlayer.id === homePlayer.id) {
           console.log("i am the home player");
           localStorage.setItem(
