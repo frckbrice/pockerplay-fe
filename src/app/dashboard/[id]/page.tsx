@@ -152,11 +152,13 @@ export default function Page() {
   });
 
   console.log("first: ", stats);
+  console.log(homePlayer.id)
 
   socket.on("sending", (data) => {
     if(data) {
-      if(data.player_id === homePlayer.id && data.role === role)
-        setGuess_player_Sending("")
+      console.log(homePlayer.id===data.player_id)
+      if(data.role === role ){setGuess_player_Sending("")}
+        
       else setGuess_player_Sending(data.text)
     }
   });
