@@ -4,6 +4,12 @@
 Project view.
 ## App
 ![home](/public/pockerplay/pockerpwa.png) 
+![verification](/public/pockerplay/pokerplayverification.png) 
+![dashboard](/public/pockerplay/pockerplaydashbord.png) 
+![gameboard_for_copy_sharelink](/public/pockerplay/pocjerplaycopylink.png) 
+![gameboard_for_copy_generateoptions](/public/pockerplay/pockerplaygenerate.png) 
+![gameboard_for_copy_sendOption](/public/pockerplay/pockeroneplayer.png) 
+![gameboard_for_copy_receivingGuess](/public/pockerplay/pockerplay2players.png) 
 
 
 ## About
