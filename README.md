@@ -1,34 +1,41 @@
 
-#PockerPlay Game
+# PockerPlay Game app
 
 Project view.
 ## App
-![emptyDashboard]('/public/image/emptyDashboard') 
-![pockerhome]('/public/image/pockerhome') 
-![pockerplayDashboard]('/public/image/pockerplayDashboard') 
+![home]('/public/pockerplay/pockerpwa.png') 
+![verification]('/public/pockerplay/pokerplayverification.png') 
+![dashboard]('/public/pockerplay/pockerplaydashbord.png') 
+![gameboard_for_copy_sharelink]('/public/pockerplay/pocjerplaycopylink.png') 
+![gameboard_for_copy_generateoptions]('/public/pockerplay/pockerplaygenerate.png') 
+![gameboard_for_copy_sendOption]('/public/pockerplay/pockeroneplayer.png') 
+![gameboard_for_copy_receivingGuess]('/public/pockerplay/pockerplay2players.png') 
 
 ## About
 
-This game implements a simple exchanges of assets and guess (images and words) between two players. To start the game, one user need to create the game on the plateforme and share the link provided by the app to other user to become your opponent inn the game.
-when the new user connect, the app notify you and then any of you can start  playing.
+This game implements a simple exchanges of assets and guess (images and words) between two players.
 
 ## Play Game
-simple play the game by generating new assets(images or words), then make your choice. After that send that set to the other player in order for him to guess what was your choice. if the guess is correct, the guess player win that session.
+
 To start the game, the principle is simple. open the app and click on "GET STARTED", then add your username. After click on "Create game". this last will lead 
-you to the dashboard of the game and the link to share will be displayed. you can now give the link to any potential player. when that player connect to the 
-app by adding his/her own name, you will be notify. The game can start.
+you to the dashboard of the game and the link to share will be displayed. You can now copy the link (simply click on it to copy), then give the link to any potential player. 
+
+Upon receiving the link, the opponent just need to past that link in the browser URL field and validate.
+When that player connect to the app and follow the instructions till the game boad, you will be notify. The game can start.
+
+simple play the game by generating new assets(images or words), then make your choice. After that send that set (your choice and the list of generated options by pressing "SEND" button) to the other player in order for him to guess what was your choice. If the guess is correct, the guess player win that session.
 
 The game has only 5 rounds per sessions. At the end of session you will have a statistic page making the summary of the 5 rounds.
 You have the possibility to conctinue the game if you close the app. the only thing, to drop the game is to logout.
 
+The player has also the possibility to change the opponent. This means that another user can connect to the sam game session using the ID of the session provided in the link.
+
 ## Built With
 
-- typescript v5.1.3
-- NextJS v14.0.4
-- NextJs 
-- @faker-js/faker v8.3.1
-- sequelize v6.35.2,
-- MySQL
+-FRONT-END:  typescript v5.1.3, NextJS v14.0.4, tailwindCss, socket.io-client, next-pwa
+-BACK-END:  NestJs: @nestjs/cli, @nestjs/schematics, , @nestjs/websockets, @faker-js/faker
+-DATABASE: MySQL, sequelize-typescript
+-
 
 ### Prerequisites
 
@@ -36,6 +43,7 @@ Knowledge about TS:
 
 - Basic data structures
 - Arrays
+- objects
 - Functions
 - Constructors
 - sequelize ORM
@@ -53,14 +61,10 @@ Knowledge about TS:
 - $ `cd pockerplay-frontend `
 - $ `git checkout feature
 
-## Test
-
-- run `npm run test` to run test
-  ![Results](./assets/test.png)
 
 ## Live Site
 
-[Link](https://pkplay.vercel.app/)
+[Link](https://pockerplay.vercel.app/)
 
 ## Author
 
@@ -95,23 +99,3 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
