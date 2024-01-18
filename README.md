@@ -3,7 +3,7 @@
 
 Project view.
 ## App
-![home]('/public/pockerplay/pockerpwa.png') 
+![home]('/pockerplay/pockerpwa.png') 
 
 
 ## About
