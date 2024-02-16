@@ -34,9 +34,10 @@ The player has also the possibility to change the opponent. This means that anot
 ## Built With
 
 -FRONT-END:  typescript v5.1.3, NextJS v14.0.4, tailwindCss, socket.io-client, next-pwa
+
 -BACK-END:  NestJs: @nestjs/cli, @nestjs/schematics, , @nestjs/websockets, @faker-js/faker
+
 -DATABASE: MySQL, sequelize-typescript
--
 
 ### Prerequisites
 
