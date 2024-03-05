@@ -15,6 +15,7 @@ Project view.
 ## About
 
 This game implements a simple exchanges of assets and guess (images and words) between two players.
+The goal is to have fun while spending time.
 
 ## Play Game
 
